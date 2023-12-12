@@ -23,8 +23,8 @@ auto parseInput(const string &input) {
       int start = str.find(':') + 1, mid = str.find('|', start);
       auto winners = splitStringToNumbers<int>(str.substr(start, mid - start), ' ');
       auto numbers = splitStringToNumbers<int>(str.substr(mid + 1), ' ');
+      // Intersect numbers and winners
       ranges::sort(winners);  // For efficiency
-      // Loop on numbers, accumulating if it's in winners
       return accumulate(numbers.begin(), numbers.end(), 0, [&winners](int prev, int n) {
         return (ranges::binary_search(winners, n)) ? prev + 1 : prev;
       });

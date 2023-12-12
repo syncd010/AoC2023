@@ -50,16 +50,19 @@ An easy day, with a bit of high school math. The distance traveled is given by t
 
 ## [Day 7](https://adventofcode.com/2023/day/7)
 Today wasn't challenging, but it took some work. 
-For part one the relevant issue is to order the hands according to the rules, to sort them posteriorly. To order them we need to calculate:
-- The type of the hand, which is done by checking how many different cards there are, and from there discover which type it is, assigning an appropriate value;
-- For hands of the same type, use an auxiliary variable equal to the hand, with `AKQJT` substituted by chars in lexicographic order, so that we can later simply compare 2 strings to order them;
-For part two we need to deal with jokers when determining the hand type. Jokers are repeatedly substituted by other cards in the hand, creating new "concrete" hands without the jokers, and the type is the maximum value of the "concrete" hands. No optimization is done here, all possible hands are created.
+For part one the relevant issue is to sort the hands according to the rules, so we need to calculate:
+- A score for the type of hands, which is done by replacing each card in the hand with the number of times that card appears in the hand and summing it (so that a five of a kind becomes 25, a four of a kind becomes 17, etc - this creates a correct order on the types);
+- For hands of the same type, substitute `AKQJT` by chars in lexicographic order (`edcba`), so that a string comparison between 2 hands of the same type orders them correctly;
+For part two we need to deal with jokers when determining the hand type. Jokers are substituted by other cards already in the hand, creating new hands without the jokers which are scored, and the maximum type score is used.
 
 ## [Day 8](https://adventofcode.com/2023/day/8)
-Not a hard day, but it had a twist in part two. 
-Part one is a relatively simple tree/graph traversal, following the given path until the end node is reached. I included a simple direct loop check, so that the test input from part two didn't hang up here.
-For part two, i must admit that my first solution was a direct one, beginning on the start nodes and following the path until all of them were end nodes. This (predictably) worked on the test data, but not on the real input data, which become apparent after about 30s of runtime. Taking a second look, and given previous AoC experiences, it was obvious that there were loops in the paths followed by the different start nodes, and that the solution would be the least common multiple of the length of the different loops. The end result is very large, so i still had to convert all results to int64_t to avoid overflows.
-
+Not a hard day, but it had a twist in part two.
+The parsed representation of the input is: 
+1) a string of the path, each character considered individually;
+2) a map where the keys are nodes (as strings) and the values are pairs of the left/right nodes to follow when traversing the graph.
+Given this, part one is a relatively simple tree/graph traversal, starting on the "AAA" node and following the given path until the end node is reached. I included a simple direct loop check, so that the test input from part two didn't hang up here.
+For part two there should be multiple start nodes, all those that end with 'A'. My first solution was a direct one, trying to advance from the start nodes step by step following the path, until all of them were end nodes. This (predictably) worked on the test data, but not on the real input data, which become apparent after about 30s of runtime. Taking a second look at the test data, and given previous AoC experiences, it was clear that there should be loops in the paths followed by the different start nodes, and that the solution would be the least common multiple of the length of the different loops. Making a general version of this would take some work (identifying all loops (making sure that they were real loops, considering the path), and account for start path segments not part of the loop), but i first tried a simple solution of taking the initial length of each path until the end node and get the LCM of those lengths - lots of assumptions on this, but thankfully the input was precisely built for this, and i got the right result.
+The end result is very large, so i still had to convert to int64_t to avoid overflows.
 
 ## [Day 9](https://adventofcode.com/2023/day/9)
 

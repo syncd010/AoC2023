@@ -64,7 +64,7 @@ int main(const int argc, const char *const argv[]) {
     auto ms = duration_cast<chrono::milliseconds>(t2 - t1);
 
     if (holds_alternative<monostate>(res)) {
-      cout << partDesc << ": Didn't return a value";
+      cout << partDesc << ": Didn't return a value\n";
     } else if (holds_alternative<string>(res)) {
       cout << format("{} ({}): {}\n", partDesc, ms, get<string>(res));
     } else if (holds_alternative<int64_t>(res)) {
