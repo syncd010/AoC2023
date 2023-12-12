@@ -65,6 +65,8 @@ For part two there should be multiple start nodes, all those that end with 'A'. 
 The end result is very large, so i still had to convert to int64_t to avoid overflows.
 
 ## [Day 9](https://adventofcode.com/2023/day/9)
+One of the most straightforward days, guess it's the calm before the storm.
+Not much to explain, need to calculate the differences until all 0 (constant) and sum up the last difference to get the next value - high school calculus. For part two the most direct way is to reverse the input numbers and do the same computation.
 
 ## [Day 10](https://adventofcode.com/2023/day/10)
 
