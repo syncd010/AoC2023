@@ -39,7 +39,6 @@ int64_t nextInSequence(const vector<int64_t> &sequence) {
 // Parse input to lines of vector of numbers
 auto parseInput(const string &input) {
   return splitStringBy(input, '\n') 
-    | views::filter([](string_view s) { return !s.empty(); })
     | views::transform([](string_view s) { return splitStringToNumbers<int64_t>(s, ' '); });
 }
 

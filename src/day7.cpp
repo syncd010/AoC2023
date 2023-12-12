@@ -72,7 +72,6 @@ private:
 // Parse input into a vector of hands
 vector<Hand> parseInput(const string &input, bool useJokers) {
   auto rg = splitStringBy(input, '\n')
-    | views::filter([](auto line) { return !line.empty(); })
     | views::transform([useJokers](auto line) {
       size_t pos = line.find(' ');
       return Hand(line.substr(0, pos), ston<int>(line.substr(pos+1)), useJokers);

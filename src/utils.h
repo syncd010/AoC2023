@@ -5,6 +5,9 @@
 #include <string_view>
 #include <ranges>
 #include <algorithm>
+#include <cmath>
+#include <vector>
+#include <ostream>
 
 namespace aoc {
 
@@ -58,10 +61,7 @@ template <typename T, typename U>
 std::vector<T> splitStringToNumbers(const std::string_view str, const U delim, int base = 10) {
   auto splits = str
     | std::views::split(delim)
-    | std::views::filter([](auto rg) {
-      if (rg.empty()) return false;
-      return true;
-    })
+    | std::views::filter([](auto rg) { return !rg.empty(); })
     | std::views::transform([](auto rg) {
       return ston<T>(std::string_view(rg.begin(), rg.end()));
     });
@@ -75,14 +75,57 @@ std::vector<T> splitStringToNumbers(const std::string_view str, const U delim, i
  * @param delim delimiter to use
  * @return Range with string splits, each one converted to string
 */
-template<typename T>
-constexpr auto splitStringBy(const std::string_view &str, const T &delim) {
-    return str
-        | std::views::split(delim)
-        | std::views::transform([](auto rg){
-              return std::string_view(rg.begin(), rg.end());
-          });
+template<typename R=std::string_view, typename T = char>
+constexpr auto splitStringBy(const std::string_view &str, const T &delim, bool keepEmptyLines = false) {
+  return str
+    | std::views::split(delim)
+    | std::views::filter([keepEmptyLines](auto rg) { return keepEmptyLines || !rg.empty(); })
+    | std::views::transform([](auto rg){
+          return R(rg.begin(), rg.end());
+      });
 };
+
+/**
+ * Checks whether a value is between [min, max)
+ * 
+ * @param val Value
+ * @param min Inclusive minimum
+ * @param max Exclusive maximum
+ * @return whether val is between [min, max)
+*/
+template<typename T>
+constexpr bool inBounds(T val, T min, T max) {
+  return val >= min && val < max;
+}
+
+/**
+ * Simple 2D position / direction encapsulation
+*/
+template<typename T>
+struct Vector2 {
+  T x, y;
+
+  Vector2 operator+(const Vector2 &other) const { return Vector2{x + other.x, y + other.y}; }
+  Vector2 operator-(const Vector2 &other) const { return Vector2{x - other.x, y - other.y}; }
+
+  bool operator==(const Vector2 &other) const { return x == other.x && y == other.y; }
+
+  double distanceTo(Vector2 other) {
+    T dx = x - other.x, dy = y - other.y;
+    return std::sqrt(dx * dx + dy * dy);
+  }
+
+  T manhattanDistanceTo(Vector2 other) {
+    T dx = x - other.x, dy = y - other.y;
+    return std::abs(dx) + std::abs(dy);
+  }
+};
+
+template<typename T>
+std::ostream & operator<<(std::ostream &os, const Vector2<T> & c) {
+	os << "[" << c.x << ", " << c.y << "]";
+	return os;
+}
 
 } // namespace aoc
 

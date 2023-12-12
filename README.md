@@ -69,8 +69,11 @@ One of the most straightforward days, guess it's the calm before the storm.
 Not much to explain, need to calculate the differences until all 0 (constant) and sum up the last difference to get the next value - high school calculus. For part two the most direct way is to reverse the input numbers and do the same computation.
 
 ## [Day 10](https://adventofcode.com/2023/day/10)
+Todo
 
 ## [Day 11](https://adventofcode.com/2023/day/11)
+Relatively straightforward and fun day, though care must be taken to correctly expand the space.
+The input is scanned to get a list of the empty rows and columns that will be expanded and a list of the positions that are filled. Each position is then expanded by a factor proportional to how many empty rows/columns are before it in the space (using different factors for part one and two). Finally the Manhattan distance is calculated for each unique pair of positions.
 
 ## [Day 12](https://adventofcode.com/2023/day/12)
 

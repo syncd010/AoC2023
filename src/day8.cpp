@@ -22,8 +22,7 @@ using Graph = unordered_map<string_view, pair<string_view, string_view>>;
 
 // Return input parsed as a pair <path, graph as a map>
 pair<string_view, Graph> parseInput(const string &input) {
-  auto lines = splitStringBy(input, '\n')
-    | views::filter([](auto l) { return !l.empty(); });
+  auto lines = splitStringBy(input, '\n');
 
   string_view path = *lines.begin();
   Graph graph{};

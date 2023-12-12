@@ -6,7 +6,7 @@ cmake_minimum_required(VERSION 3.14)
 # set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -stdlib=libc++ -fexperimental-library")
 # set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -stdlib=libc++ -lc++abi")
 
-set(AOC_DAYS_LIST "1;2;3;4;5;6;7;8;9")
+set(AOC_DAYS_LIST "1;2;3;4;5;6;7;8;9;10;11")
 
 project(AdventOfCode2023 VERSION 1.0)
 
@@ -25,6 +25,10 @@ foreach(DAY ${AOC_DAYS_LIST})
 endforeach()
 
 # Google tests
+if (CMAKE_VERSION VERSION_GREATER_EQUAL "3.24.0")
+    cmake_policy(SET CMP0135 NEW)
+endif()
+
 include(FetchContent)
 FetchContent_Declare(
   googletest

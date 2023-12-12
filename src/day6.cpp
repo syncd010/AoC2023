@@ -18,7 +18,6 @@ using namespace aoc;
 
 Result solvePartOne(const string &input) {
   auto parsed = splitStringBy(input, '\n')
-    | views::filter([](auto line) { return !line.empty(); })
     | views::transform([](auto line) {
       return splitStringToNumbers<int>(line.substr(line.find(":")+1), ' ');
     });
@@ -40,7 +39,6 @@ Result solvePartOne(const string &input) {
 
 Result solvePartTwo(const string &input) {
   auto parsed = splitStringBy(input, '\n')
-    | views::filter([](auto line) { return !line.empty(); })
     | views::transform([](auto line) {
       auto lineNumbers = line | views::filter(::isdigit);
       return stol(string(lineNumbers.begin(), lineNumbers.end()));
