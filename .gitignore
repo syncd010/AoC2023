@@ -1,0 +1,10 @@
+# Build directory contents
+build/*
+
+# IDEs
+*.iml
+*.ipr
+*.iws
+.idea/
+
+.vscode/

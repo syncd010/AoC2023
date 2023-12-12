@@ -1,0 +1,25 @@
+#include <algorithm>
+#include <iostream>
+#include <map>
+#include <numeric>
+#include <ranges>
+#include <string>
+#include <string_view>
+#include <vector>
+
+#include "aoc.h"
+#include "utils.h"
+
+namespace aocDAY {
+
+using namespace std;
+using namespace aoc;
+
+int solvePartOne(const string &input) {
+  return 0;
+}
+
+int solvePartTwo(const string &input) {
+  return 0;
+}
+} // namespace aocDAY
