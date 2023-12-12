@@ -109,7 +109,7 @@ vector<Hand> parseInput(const string &input, bool useJokers) {
   return vector<Hand>(rg.begin(), rg.end());
 }
 
-int solve(const string &input, bool useJokers) {
+Result solve(const string &input, bool useJokers) {
   auto hands = parseInput(input, useJokers);
   sort(hands.begin(), hands.end());
 
@@ -121,11 +121,11 @@ int solve(const string &input, bool useJokers) {
   return ret;
 }
 
-int solvePartOne(const string &input) {
+Result solvePartOne(const string &input) {
   return solve(input, false);
 }
 
-int solvePartTwo(const string &input) {
+Result solvePartTwo(const string &input) {
   return solve(input, true);
 }
 } // namespace aoc7

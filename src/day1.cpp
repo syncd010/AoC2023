@@ -14,7 +14,7 @@ namespace aoc1 {
 using namespace std;
 using namespace aoc;
 
-int solvePartOne(const string &input) {
+Result solvePartOne(const string &input) {
   auto nums = input
     | views::split('\n') 
     | views::transform([](auto line) {
@@ -23,10 +23,11 @@ int solvePartOne(const string &input) {
         return digits.empty() ? 0 : stoi(string() + digits.front() + digits.back());
     }) 
     | views::common;
+  
   return accumulate(nums.begin(), nums.end(), 0);
 }
 
-int solvePartTwo(const string &input) {
+Result solvePartTwo(const string &input) {
   map<string, char> digits{{"one", '1'},   {"two", '2'},   {"three", '3'},
                            {"four", '4'},  {"five", '5'},  {"six", '6'},
                            {"seven", '7'}, {"eight", '8'}, {"nine", '9'}};

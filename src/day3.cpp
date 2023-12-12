@@ -56,12 +56,12 @@ vector<int> findNums(const string &input, bool partTwoRules = false) {
   return res;
 }
 
-int solvePartOne(const string &input) {
+Result solvePartOne(const string &input) {
   auto nums = findNums(input);
   return accumulate(nums.begin(), nums.end(), 0);
 }
 
-int solvePartTwo(const string &input) {
+Result solvePartTwo(const string &input) {
   auto nums = findNums(input, true);
   int res = 0;
   for (int i = 0; i < nums.size(); i += 2) {

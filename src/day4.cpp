@@ -31,7 +31,7 @@ auto parseInput(const string &input) {
     });
 }
 
-int solvePartOne(const string &input) {
+Result solvePartOne(const string &input) {
   auto nums = parseInput(input)
     | views::common;
   return accumulate(nums.begin(), nums.end(), 0, [](int prev, int exp) {
@@ -40,7 +40,7 @@ int solvePartOne(const string &input) {
   });
 }
 
-int solvePartTwo(const string &input) {
+Result solvePartTwo(const string &input) {
   auto nums_rg = parseInput(input);
   vector nums(nums_rg.begin(), nums_rg.end());
   vector cards(distance(nums.begin(), nums.end()), 1);

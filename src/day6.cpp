@@ -16,7 +16,7 @@ namespace aoc6 {
 using namespace std;
 using namespace aoc;
 
-int solvePartOne(const string &input) {
+Result solvePartOne(const string &input) {
   auto parsed = splitStringBy(input, '\n')
     | views::filter([](auto line) { return !line.empty(); })
     | views::transform([](auto line) {
@@ -38,7 +38,7 @@ int solvePartOne(const string &input) {
   return ret;
 }
 
-int solvePartTwo(const string &input) {
+Result solvePartTwo(const string &input) {
   auto parsed = splitStringBy(input, '\n')
     | views::filter([](auto line) { return !line.empty(); })
     | views::transform([](auto line) {
@@ -49,6 +49,6 @@ int solvePartTwo(const string &input) {
   auto T = params[0], D = params[1];
   auto minT = (T - sqrt(T*T - 4*D)) / 2,
     maxT = (T + sqrt(T*T - 4*D)) / 2;
-  return ceil(maxT) - floor(minT) - 1;
+  return (int)ceil(maxT) - (int)floor(minT) - 1;
 }
 } // namespace aoc6

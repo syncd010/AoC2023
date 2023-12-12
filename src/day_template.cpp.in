@@ -15,11 +15,11 @@ namespace aocDAY {
 using namespace std;
 using namespace aoc;
 
-int solvePartOne(const string &input) {
-  return 0;
+Result solvePartOne(const string &input) {
+  return std::monostate{};
 }
 
-int solvePartTwo(const string &input) {
-  return 0;
+Result solvePartTwo(const string &input) {
+  return std::monostate{};
 }
 } // namespace aocDAY

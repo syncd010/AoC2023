@@ -56,6 +56,10 @@ For part one the relevant issue is to order the hands according to the rules, to
 For part two we need to deal with jokers when determining the hand type. Jokers are repeatedly substituted by other cards in the hand, creating new "concrete" hands without the jokers, and the type is the maximum value of the "concrete" hands. No optimization is done here, all possible hands are created.
 
 ## [Day 8](https://adventofcode.com/2023/day/8)
+Not a hard day, but it had a twist in part two. 
+Part one is a relatively simple tree/graph traversal, following the given path until the end node is reached. I included a simple direct loop check, so that the test input from part two didn't hang up here.
+For part two, i must admit that my first solution was a direct one, beginning on the start nodes and following the path until all of them were end nodes. This (predictably) worked on the test data, but not on the real input data, which become apparent after about 30s of runtime. Taking a second look, and given previous AoC experiences, it was obvious that there were loops in the paths followed by the different start nodes, and that the solution would be the least common multiple of the length of the different loops. The end result is very large, so i still had to convert all results to int64_t to avoid overflows.
+
 
 ## [Day 9](https://adventofcode.com/2023/day/9)
 

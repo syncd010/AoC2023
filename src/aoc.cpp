@@ -6,6 +6,7 @@
 #include <string>
 #include <string_view>
 #include <vector>
+#include <chrono>
 
 #include "aoc.h"
 #include "utils.h"
@@ -55,16 +56,32 @@ int main(const int argc, const char *const argv[]) {
   fs.close();
   const auto input = buffer.str();
 
+  auto execSolve = [](auto solveFunc, const string &input, const string &partDesc) {
+
+    auto t1 = chrono::high_resolution_clock::now();
+    Result res = solveFunc(input);
+    auto t2 = chrono::high_resolution_clock::now();
+    auto ms = duration_cast<chrono::milliseconds>(t2 - t1);
+
+    if (holds_alternative<monostate>(res)) {
+      cout << partDesc << ": Didn't return a value";
+    } else if (holds_alternative<string>(res)) {
+      cout << format("{} ({}): {}\n", partDesc, ms, get<string>(res));
+    } else if (holds_alternative<int64_t>(res)) {
+      cout << format("{} ({}): {}\n", partDesc, ms, get<int64_t>(res));
+    }
+  };
+
   switch (ston<int>(day)) {
   default:
     cout << "Day " << day << " not implemented.";
     return EXIT_FAILURE;
 
 // Case for handling each day
-#define AOC_DAY_CASE(macro_day)                                                \
-  case ston<int>(#macro_day):                                                      \
-    cout << "Part one: " << aoc##macro_day::solvePartOne(input) << "\n";     \
-    cout << "Part two: " << aoc##macro_day::solvePartTwo(input) << "\n";     \
+#define AOC_DAY_CASE(macro_day)                                              \
+  case ston<int>(#macro_day):                                                \
+    execSolve(aoc##macro_day::solvePartOne, input, "Part one");                     \
+    execSolve(aoc##macro_day::solvePartTwo, input, "Part two");                     \
     break;
 
     // Generate cases for all days

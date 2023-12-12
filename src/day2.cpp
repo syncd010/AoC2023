@@ -52,7 +52,7 @@ vector<Game> parseInput(const string &input) {
   return vector(games.begin(), games.end());
 }
 
-int solvePartOne(const string &input) {
+Result solvePartOne(const string &input) {
   auto possibleGames = parseInput(input)
     | views::filter([](Game g) {   // Filter possible games, according to the rules
       const map<string, int> possible = {{"red", 12}, {"blue", 14}, {"green", 13}};
@@ -69,7 +69,7 @@ int solvePartOne(const string &input) {
   return accumulate(possibleGames.begin(), possibleGames.end(), 0);
 }
 
-int solvePartTwo(const string &input) {
+Result solvePartTwo(const string &input) {
   auto power = parseInput(input)
     | views::transform([](Game g) {   // Get the power of each game
       map<string, int> max_d = {{"red", 0}, {"blue", 0}, {"green", 0}};
