@@ -55,14 +55,14 @@ int main(const int argc, const char *const argv[]) {
   fs.close();
   const auto input = buffer.str();
 
-  switch (cston<int>(day)) {
+  switch (ston<int>(day)) {
   default:
     cout << "Day " << day << " not implemented.";
     return EXIT_FAILURE;
 
 // Case for handling each day
 #define AOC_DAY_CASE(macro_day)                                                \
-  case cston<int>(#macro_day):                                                      \
+  case ston<int>(#macro_day):                                                      \
     cout << "Part one: " << aoc##macro_day::solvePartOne(input) << "\n";     \
     cout << "Part two: " << aoc##macro_day::solvePartTwo(input) << "\n";     \
     break;

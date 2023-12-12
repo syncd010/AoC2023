@@ -16,7 +16,7 @@ target_sources(aoc PRIVATE
     ${CMAKE_CURRENT_SOURCE_DIR}/src/aoc.cpp
 )
 
-set(AOC_DAYS_LIST "1;2;3;4;5;6")
+set(AOC_DAYS_LIST "1;2;3;4;5;6;7")
 
 foreach(DAY ${AOC_DAYS_LIST})
     target_sources(aoc PRIVATE

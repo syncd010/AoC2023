@@ -22,7 +22,7 @@ struct AlmanacMap {
   vector<vector<long>> mappings;
 };
 
-tuple<vector<long>, vector<AlmanacMap>> parseInput(const string_view &input) {
+tuple<vector<long>, vector<AlmanacMap>> parseInput(const string &input) {
   auto lines = input
         | views::split('\n')
         | views::filter([](auto rg) { return !rg.empty(); })

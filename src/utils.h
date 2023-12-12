@@ -11,18 +11,18 @@ namespace aoc {
 /**
  * String-to-number as constexpr
  *
- * @param str Strint to convert
+ * @param str String to convert
  * @param base Base to interpret
  * @return Number represented by string
  */
 template<typename T>
-constexpr T cston(std::string_view str, const int base = 10) {
+constexpr T ston(std::string_view str, const int base = 10) {
   T ret = 0;
-  bool is_negative = false;
+  bool negative = false;
   for (const auto c : str) {
     switch (c) {
     case '-':
-      is_negative = true;
+      negative = true;
       continue;
     case '+':
     case ' ':
@@ -43,7 +43,7 @@ constexpr T cston(std::string_view str, const int base = 10) {
     }
     ret = ret * base + digit;
   }
-  return (is_negative) ? ret * -1 : ret;
+  return (negative) ? ret * -1 : ret;
 }
 
 /**
@@ -55,7 +55,7 @@ constexpr T cston(std::string_view str, const int base = 10) {
  * @return Vector of ints
 */
 template <typename T, typename U>
-std::vector<T> splitStringToNumbers(std::string_view str, U delim, int base = 10) {
+std::vector<T> splitStringToNumbers(const std::string_view str, const U delim, int base = 10) {
   auto splits = str
     | std::views::split(delim)
     | std::views::filter([](auto rg) {
@@ -63,7 +63,7 @@ std::vector<T> splitStringToNumbers(std::string_view str, U delim, int base = 10
       return true;
     })
     | std::views::transform([](auto rg) {
-      return cston<T>(std::string_view(rg.begin(), rg.end()));
+      return ston<T>(std::string_view(rg.begin(), rg.end()));
     });
     return std::vector(splits.begin(), splits.end());
 }

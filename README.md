@@ -49,6 +49,11 @@ Part two is much more challenging, and i got to compliment the authors for, give
 An easy day, with a bit of high school math. The distance traveled is given by the function d(t) = t(T - t), where T is the race time, so we want all solutions for d(t) > D, where D is the given distance. This is a quadratic equation and solving it gives the interval (min_t, max_t) where the traveled distance is greater than D. To get the integer values on that interval calculate ceil(max_t) - floor(min_t) - 1.
 
 ## [Day 7](https://adventofcode.com/2023/day/7)
+Today wasn't challenging, but it took some work. 
+For part one the relevant issue is to order the hands according to the rules, to sort them posteriorly. To order them we need to calculate:
+- The type of the hand, which is done by checking how many different cards there are, and from there discover which type it is, assigning an appropriate value;
+- For hands of the same type, use an auxiliary variable equal to the hand, with `AKQJT` substituted by chars in lexicographic order, so that we can later simply compare 2 strings to order them;
+For part two we need to deal with jokers when determining the hand type. Jokers are repeatedly substituted by other cards in the hand, creating new "concrete" hands without the jokers, and the type is the maximum value of the "concrete" hands. No optimization is done here, all possible hands are created.
 
 ## [Day 8](https://adventofcode.com/2023/day/8)
 

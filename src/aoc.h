@@ -10,6 +10,7 @@
   macro(4)  \
   macro(5)  \
   macro(6)  \
+  macro(7)  \
   // Additional days here
 
 #define AOC_DAY_FUNCTION_DECLARATION(day)           \

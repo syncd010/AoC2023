@@ -24,14 +24,15 @@ int solvePartOne(const string &input) {
     });
   auto params = vector(parsed.begin(), parsed.end());
 
-  // Function is quadratic x(T - x) = D, with T and D given in the input
-  // Integer values > x- and < x+ are the solutions
+  // Distance is given by d(t) = t(T-t), so the solution is d(t) > D, with T 
+  // and D given in the input. Apply quadratic formula to get (minT, maxT)
+  // Solutions are the integers in the interval (minT, maxT)
   int ret = 1;
   for (int i = 0; i < params[0].size(); i++) {
     auto T = params[0][i], D = params[1][i];
-    auto min_T = (T - sqrt(T*T - 4*D)) / 2,
-      max_T = (T + sqrt(T*T - 4*D)) / 2;
-      ret *= ceil(max_T) - floor(min_T) - 1;
+    auto minT = (T - sqrt(T*T - 4*D)) / 2,
+      maxT = (T + sqrt(T*T - 4*D)) / 2;
+      ret *= ceil(maxT) - floor(minT) - 1;
   }
 
   return ret;
@@ -41,13 +42,13 @@ int solvePartTwo(const string &input) {
   auto parsed = splitStringBy(input, '\n')
     | views::filter([](auto line) { return !line.empty(); })
     | views::transform([](auto line) {
-      auto line_n = line | views::filter(::isdigit);
-      return cston<long>(string(line_n.begin(), line_n.end()));
+      auto lineNumbers = line | views::filter(::isdigit);
+      return stol(string(lineNumbers.begin(), lineNumbers.end()));
     });
   auto params = vector(parsed.begin(), parsed.end());
   auto T = params[0], D = params[1];
-  auto min_T = (T - sqrt(T*T - 4*D)) / 2,
-    max_T = (T + sqrt(T*T - 4*D)) / 2;
-  return ceil(max_T) - floor(min_T) - 1;
+  auto minT = (T - sqrt(T*T - 4*D)) / 2,
+    maxT = (T + sqrt(T*T - 4*D)) / 2;
+  return ceil(maxT) - floor(minT) - 1;
 }
 } // namespace aoc6

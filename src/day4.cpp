@@ -16,9 +16,9 @@ using namespace std;
 using namespace aoc;
 
 // Returns a range of how many numbers are winners for each card
-auto parseInput(const string_view &input) {
+auto parseInput(const string &input) {
   return splitStringBy(input, '\n')     // Split lines
-    | views::transform([](const string_view &str) {
+    | views::transform([](string_view str) {
       // Get the winner and card numbers
       int start = str.find(':') + 1, mid = str.find('|', start);
       auto winners = splitStringToNumbers<int>(str.substr(start, mid - start), ' ');
