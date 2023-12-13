@@ -19,17 +19,6 @@ using Position = Vector2<int64_t>;
 
 constexpr int64_t EXP_FACTOR = 100;
 
-// Transpose board
-vector<string> transpose(vector<string> orig) {
-  size_t sz = min(orig.size(), orig[0].size());
-  for (int i = 0; i < sz; i++) {
-    for (int j = i + 1; j < sz; j++) {
-      swap(orig[i][j], orig[j][i]);
-    }
-  }
-  return orig;
-}
-
 vector<int64_t> findEmptyRows(const auto &board) {
   vector<int64_t> empty{};
   for (size_t i = 0; i < board.size(); i++) {
@@ -46,7 +35,7 @@ Result solve(const string &input, int64_t expandFactor = 1) {
   size_t h = board.size(), w = board[0].size();
 
   // Find empty rows and columns
-  vector<int64_t> emptyRows = findEmptyRows(board), emptyCols = findEmptyRows(transpose(board));
+  vector<int64_t> emptyRows = findEmptyRows(board), emptyCols = findEmptyRows(transposeBoard(board));
 
   // Find positions
   vector<Position> positions{};

@@ -11,6 +11,19 @@
 
 namespace aoc {
 
+// Transpose board
+template<typename T>
+std::vector<std::string> transposeBoard(const std::vector<T> &orig) {
+  std::vector<std::string> dest = std::vector(orig[0].size(), std::string(orig.size(), ' '));
+
+  for (int y = 0; y < orig.size(); y++) {
+    for (int x = 0; x < orig[y].size(); x++) {
+      dest[x][y] = orig[y][x];
+    }
+  }
+  return dest;
+}
+
 /**
  * String-to-number as constexpr
  *
