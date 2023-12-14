@@ -36,18 +36,15 @@ vector<string> tiltBoard(const vector<string> &board, const Position dir) {
   // Loop according to dir: starting from the start or end, so that we don't overwrite positions
   for (int y = (dir.y == 1) ? h - 1 : 0; y >= 0 && y < h ; y += (dir.y == 1) ? -1 : 1) {
     for (int x = (dir.x == 1) ? w - 1: 0; x >= 0 && x < w ; x += (dir.x == 1) ? -1 : 1) {
-      if (board[y][x] == ROCK) {
+      if (newBoard[y][x] == ROCK) {
         Position pos = Position(x, y) + dir;
-        int count = 0;
-        // Loop until a cube is found or end reached, count how many rocks found
-        while (insideBoard(board, pos) && board[pos.y][pos.x] != CUBE) {
-          if (board[pos.y][pos.x] == ROCK) count++;
+        // Loop until a cube is found or end reached
+        while (insideBoard(newBoard, pos) && newBoard[pos.y][pos.x] == EMPTY) {
           pos.moveBy(dir);
         }
         // Clear previous position, put rock on final position. Must be in sync with the loop direction
         newBoard[y][x] = EMPTY;
-        pos = pos - dir * (count + 1);
-        newBoard[pos.y][pos.x] = ROCK;
+        newBoard[pos.y - dir.y][pos.x - dir.x] = ROCK;
       }
     }
   }

@@ -69,14 +69,22 @@ One of the most straightforward days, guess it's the calm before the storm.
 Not much to explain, need to calculate the differences until all 0 (constant) and sum up the last difference to get the next value - high school calculus. For part two the most direct way is to reverse the input numbers and do the same computation.
 
 ## [Day 10](https://adventofcode.com/2023/day/10)
-Todo later, too much to say
+As expected, a lot of work on Sundays. This type of problems is sometimes suited for complex math, but given that in C++ a solution using `Complex` would be very similar to using a 2D vector to model positions and directions i choose the later as it is more readable. Some relevant notes on the solution:
+- A map of the exits of each type of cell is created and used to navigate the maze;
+- To find the biggest loop, start from the initial cell, follow the 4 possible directions and check if it returns to the initial cell;
+- To navigate the maze, follow a specific direction and use the mentioned map of exits for each cell type to move from cell to cell. Need to handle dead ends and cells that don't communicate with each other (their entry/exit directions aren't consisted, using the exits map to check that);
+- For part two, start by creating a new maze with just the main loop and deduce the type of the initial cell by checking its neighbors and making sure it is consistent with their entry/exit directions. The type of all cells must be know for the following step;
+- To count inside cells, loop on each line keeping an inside/outside indicator. When a "wall" is found, invert th indicator and count the cells when inside is active. Only invert the indicator on '|' cell types and one of the corner pairs ['F', '7'] or ['L', 'J'] otherwise a double inversion of the indicator could occur.
 
 ## [Day 11](https://adventofcode.com/2023/day/11)
 Relatively straightforward and fun day, though care must be taken to correctly expand the space.
 The input is scanned to get a list of the empty rows and columns that will be expanded and a list of the positions that are filled. Each position is then expanded by a factor proportional to how many empty rows/columns are before it in the space (using different factors for part one and two). Finally the Manhattan distance is calculated for each unique pair of positions.
 
 ## [Day 12](https://adventofcode.com/2023/day/12)
-Todo later, too much to say
+Yet another challenging day, so soon after Sunday. An error correcting code that can be understood as a constraint satisfaction problem, the records being the state and the groups the constraints. Problem is, i couldn't devise any rules for constraint propagation, so what's left is trying possible solutions, checking if they are valid and backtracking if not. A dynamic programming problem, with the potential for exponential runtime (and/or memory usage).
+Two possible approaches are available: 1) starting from the records, try the different possibilities for each '?' and check if the group constraints are satisfied or 2) starting from the group constraints, try to place them sequentially where possible and check if they are consistent with the record. The second approach seemed more efficient in time and space so that was what i followed, hoping that it could be used directly for part two of the day.
+The solution is therefore a recursion on the records/groups, placing one group on each iteration on available space of the record. Recurse until the end of the record is reached or the final group is placed and increase the combinations if successful. On the last group a consistency check needs to be made - whether there are any remaining '#' signs on the record indicating that there should be more groups placed.
+For part two, as expected, the input grows. At first i tried to brute force the solution on the expanded input but it was fruitlessly. I then tried to approach the problem from different angles, but couldn't find any other workable solution, until the obvious and simplest one presented itself: memoization of previous steps. It should have been obvious from the start, but it took me an embarrassingly long time to recognize it... A cache with the key being the current position on the record and the current group (hashed via a Cantor Pairing function) and the value being the number of combinations found from that point on is used to prevent repeating calculations, resulting in a quick runtime. Hopefully i don't forget this in future problems.
 
 ## [Day 13](https://adventofcode.com/2023/day/13)
 Much simpler than yesterday. There's no major insight on the solution, just a straightforward search for reflected rows. Searching on columns is done by first transposing the input and then searching on the transposed rows.
@@ -84,7 +92,7 @@ Part two introduces some noise on the solution, but the structure is the same. T
 
 ## [Day 14](https://adventofcode.com/2023/day/14)
 A familiar day, i feel that i've done this one in previous years. That didn't stop me from falling into the error of overwriting board positions when tilting. Relevant notes:
-- When tilting, each rock is placed by moving in the tilt direction until an immovable rock or the end of the board is found, counting how many rocks were passed along the way, so that it is placed in the correct spot. Needs some attention to not overwrite positions, which is done by adjusting the loop according to the tilt direction: if tilting South, loop from the end of the board to the start, otherwise loop from the beginning of the board. Likewise for tilting East/West. This guarantees that rocks are moved in the correct order, not overwriting each other.
+- When tilting, each rock is moved in the tilt direction until an obstacle is found. Needs some attention to not overwrite positions, which is done by adjusting the loop according to the tilt direction: if tilting South, loop from the end of the board to the start, otherwise loop from the beginning of the board. Likewise for tilting East/West. This guarantees that rocks are moved in the correct order, not overwriting each other.
 - For part two, a cache of the boards and indexes when they were generated is kept so that cycles can be detected. The board is evolved until a cycle is detected, which is "short-circuit" by calculating the remaining steps after the last loop on the cycle and only execute those steps. Straightforward modular arithmetic.
 
 ## [Day 15](https://adventofcode.com/2023/day/15)
