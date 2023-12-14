@@ -11,19 +11,6 @@
 
 namespace aoc {
 
-// Transpose board
-template<typename T>
-std::vector<std::string> transposeBoard(const std::vector<T> &orig) {
-  std::vector<std::string> dest = std::vector(orig[0].size(), std::string(orig.size(), ' '));
-
-  for (int y = 0; y < orig.size(); y++) {
-    for (int x = 0; x < orig[y].size(); x++) {
-      dest[x][y] = orig[y][x];
-    }
-  }
-  return dest;
-}
-
 /**
  * String-to-number as constexpr
  *
@@ -99,19 +86,6 @@ constexpr auto splitStringBy(const std::string_view &str, const T &delim, bool k
 };
 
 /**
- * Checks whether a value is between [min, max)
- * 
- * @param val Value
- * @param min Inclusive minimum
- * @param max Exclusive maximum
- * @return whether val is between [min, max)
-*/
-template<typename T>
-constexpr bool inBounds(T val, T min, T max) {
-  return val >= min && val < max;
-}
-
-/**
  * Simple 2D position / direction encapsulation
 */
 template<typename T>
@@ -120,8 +94,19 @@ struct Vector2 {
 
   Vector2 operator+(const Vector2 &other) const { return Vector2{x + other.x, y + other.y}; }
   Vector2 operator-(const Vector2 &other) const { return Vector2{x - other.x, y - other.y}; }
+  Vector2 operator*(T factor) const { return Vector2{x * factor, y * factor}; }
 
   bool operator==(const Vector2 &other) const { return x == other.x && y == other.y; }
+
+  /**
+   * Moves the vector by the amount specified
+   * 
+   * @param dist Distance to move
+  */
+  void moveBy(Vector2 dist) {
+    x += dist.x;
+    y += dist.y;
+  }
 
   double distanceTo(Vector2 other) {
     T dx = x - other.x, dy = y - other.y;
@@ -140,6 +125,62 @@ std::ostream & operator<<(std::ostream &os, const Vector2<T> & c) {
 	return os;
 }
 
+/**
+ * Transposes a board, returns a new board
+ * 
+ * @param orig Board. Vector of string or string_view
+ * @return A new board transposed
+*/
+template<typename T>
+std::vector<std::string> transposeBoard(const std::vector<T> &orig) {
+  std::vector<std::string> dest = std::vector(orig[0].size(), std::string(orig.size(), ' '));
+
+  for (int y = 0; y < orig.size(); y++) {
+    for (int x = 0; x < orig[y].size(); x++) {
+      dest[x][y] = orig[y][x];
+    }
+  }
+  return dest;
+}
+
+/**
+ * Checks whether a value is between [min, max)
+ * 
+ * @param val Value
+ * @param min Inclusive minimum
+ * @param max Exclusive maximum
+ * @return whether val is between [min, max)
+*/
+template<typename T>
+constexpr bool inBounds(T val, T min, T max) {
+  return val >= min && val < max;
+}
+
+/**
+ * Returns whether the position is inside the board
+ * 
+ * @param board Board
+ * @param pos Position to check
+ * @return Whether the position is inside the board
+*/
+template<typename T, typename U>
+inline bool insideBoard(const std::vector<T> &board, Vector2<U> pos) {
+  U h = board.size(), w = board[0].size();
+  return inBounds(pos.x, 0, w) && inBounds(pos.y, 0, h);
+}
+
 } // namespace aoc
+
+/**
+ * Prints a board
+ * 
+ * @param board Board
+ * @param message Message to print before
+*/
+template<typename T>
+inline void displayBoard(const std::vector<T> &board, const std::string_view message = "") {
+  if (!message.empty()) std::cout << message << "\n";
+  for (const T &line : board) std::cout << line << "\n";
+}
 
 #endif

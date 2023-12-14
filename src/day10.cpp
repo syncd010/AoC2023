@@ -30,12 +30,6 @@ constexpr auto
 // Inverts a position, useful for entry/exit switches on cells
 inline Position rotate180(Position &pos) { return Position(pos.x * -1, pos.y * -1); }
 
-// Whether a position is inside the maze
-inline bool insideMaze(Position pos, const auto &maze) {
-  int h = maze.size(), w = maze[0].size();
-  return inBounds(pos.x, 0, w) && inBounds(pos.y, 0, h);
-}
-
 // Returns the Start 'S' position on the maze
 Position findStartPos(const auto &maze) {
   for (int y = 0; y < maze.size(); y++) {
@@ -67,7 +61,7 @@ vector<Position> findMaxLoop(const auto &maze) {
   for (auto d : dirs) {
     auto entryDir = rotate180(d);
     auto currPos = startPos + d;
-    if (!insideMaze(currPos, maze)) continue;
+    if (!insideBoard(maze, currPos)) continue;
 
     // Follow maze until returning to start position
     vector<Position> currLoop{currPos};
@@ -85,7 +79,7 @@ vector<Position> findMaxLoop(const auto &maze) {
 
       // Set up next pos and dir, save curr pos
       auto nextPos = currPos + exitDir;
-      if (!insideMaze(nextPos, maze)) break;
+      if (!insideBoard(maze, nextPos)) break;
       currPos = nextPos;
       entryDir = rotate180(exitDir);
       currLoop.push_back(currPos);
@@ -106,9 +100,6 @@ Result solvePartOne(const string &input) {
   return (int64_t)ceil(maxLoop.size() / 2);
 }
 
-inline void displayMaze(auto &maze) {
-  for (string_view l : maze) cout << l << "\n";
-}
 
 Result solvePartTwo(const string &input) {
   auto rg = splitStringBy<string>(input, '\n');
@@ -163,7 +154,7 @@ Result solvePartTwo(const string &input) {
       // scratch[y][x] = (in && scratch[y][x] == '.') ? 'I' : scratch[y][x];
     }
   }
-  //displayMaze(scratch);
+
   return inCount;
 }
 

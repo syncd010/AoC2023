@@ -26,6 +26,7 @@ vector<tuple<string, Result, Result>> testFiles{
     {"./data/input11Test", 374, 82000210},
     {"./data/input12Test", 21, 525152},
     {"./data/input13Test", 405, 400},
+    {"./data/input14Test", 136, 64},
 };
 
 vector<tuple<string, Result, Result>> dataFiles{
@@ -42,13 +43,14 @@ vector<tuple<string, Result, Result>> dataFiles{
     {"./data/input11", 9627977, 644248339497},
     {"./data/input12", 6488, 815364548481},
     {"./data/input13", 35210, 31974},
+    {"./data/input14", 108918, 100310},
 };
 
 string readFile(const string &filePath) {
     ifstream fs(filePath);
     if (!fs.is_open()) {
-        cout << "Error: cannot open input file: " + filePath;
-        return "";
+        cout << "Error: cannot open input file: " + filePath + "\n";
+        return string{};
     }
     // Read whole file
     stringstream buffer;
@@ -61,6 +63,7 @@ string readFile(const string &filePath) {
     TEST(AoCTest, TestFilesDay##macro_day) {                    \
         int idx = stoi(#macro_day) - 1;                         \
         string input = readFile(get<0>(testFiles[idx]));        \
+        ASSERT_TRUE(!input.empty());                            \
         Result part1 = aoc##macro_day::solvePartOne(input);     \
         Result part2 = aoc##macro_day::solvePartTwo(input);     \
         EXPECT_EQ(part1, get<1>(testFiles[idx]));               \
@@ -71,6 +74,7 @@ string readFile(const string &filePath) {
     TEST(AoCTest, DataFilesDay##macro_day) {                    \
         int idx = stoi(#macro_day) - 1;                         \
         string input = readFile(get<0>(dataFiles[idx]));        \
+        ASSERT_TRUE(!input.empty());                            \
         Result part1 = aoc##macro_day::solvePartOne(input);     \
         Result part2 = aoc##macro_day::solvePartTwo(input);     \
         EXPECT_EQ(part1, get<1>(dataFiles[idx]));               \

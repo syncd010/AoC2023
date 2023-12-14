@@ -82,8 +82,10 @@ Todo later, too much to say
 Much simpler than yesterday. There's no major insight on the solution, just a straightforward search for reflected rows. Searching on columns is done by first transposing the input and then searching on the transposed rows.
 Part two introduces some noise on the solution, but the structure is the same. The difference is that, when a line is not perfectly reflected, it checks to see if they differ by only one position, and if so, allow the reflection test to continue. Need to be careful with the conditions because only one differing line can be found.
 
-
 ## [Day 14](https://adventofcode.com/2023/day/14)
+A familiar day, i feel that i've done this one in previous years. That didn't stop me from falling into the error of overwriting board positions when tilting. Relevant notes:
+- When tilting, each rock is placed by moving in the tilt direction until an immovable rock or the end of the board is found, counting how many rocks were passed along the way, so that it is placed in the correct spot. Needs some attention to not overwrite positions, which is done by adjusting the loop according to the tilt direction: if tilting South, loop from the end of the board to the start, otherwise loop from the beginning of the board. Likewise for tilting East/West. This guarantees that rocks are moved in the correct order, not overwriting each other.
+- For part two, a cache of the boards and indexes when they were generated is kept so that cycles can be detected. The board is evolved until a cycle is detected, which is "short-circuit" by calculating the remaining steps after the last loop on the cycle and only execute those steps. Straightforward modular arithmetic.
 
 ## [Day 15](https://adventofcode.com/2023/day/15)
 
