@@ -27,6 +27,7 @@ vector<tuple<string, Result, Result>> testFiles{
     {"./data/input12Test", 21, 525152},
     {"./data/input13Test", 405, 400},
     {"./data/input14Test", 136, 64},
+    {"./data/input15Test", 1320, 145},
 };
 
 vector<tuple<string, Result, Result>> dataFiles{
@@ -44,6 +45,7 @@ vector<tuple<string, Result, Result>> dataFiles{
     {"./data/input12", 6488, 815364548481},
     {"./data/input13", 35210, 31974},
     {"./data/input14", 108918, 100310},
+    {"./data/input15", 507291, 296921},
 };
 
 string readFile(const string &filePath) {

@@ -96,6 +96,8 @@ A familiar day, i feel that i've done this one in previous years. That didn't st
 - For part two, a cache of the boards and indexes when they were generated is kept so that cycles can be detected. The board is evolved until a cycle is detected, which is "short-circuit" by calculating the remaining steps after the last loop on the cycle and only execute those steps. Straightforward modular arithmetic.
 
 ## [Day 15](https://adventofcode.com/2023/day/15)
+A pretty straightforward day. In fact it is so straightforward that i was at a loss when the result of part one wasn't correct... The issue was an extra `\n` on the input that the problem description even warned about,
+Part two's description is very convoluted but describes a simple procedure. I used vectors for the boxes and lists, which are not ideal for removing elements but given the limited size of the input, are adequate.
 
 ## [Day 16](https://adventofcode.com/2023/day/16)
 
