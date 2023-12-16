@@ -100,6 +100,9 @@ A pretty straightforward day. In fact it is so straightforward that i was at a l
 Part two's description is very convoluted but describes a simple procedure. I used vectors for the boxes and lists, which are not ideal for removing elements but given the limited size of the input, are adequate.
 
 ## [Day 16](https://adventofcode.com/2023/day/16)
+A similar day to day 10, though a bit easier. Reding part one i was expecting a hard part two, but it turned out to be pretty straightforward.
+The solution is based on following rays through the grid, and when a junction is encountered, generate new rays to follow. Stop when reaching the borders of the grid or when reaching a cell that has already been visited in the same direction. To implement this, a map of junctions/directions is defined, where for each type of junction and direction of travel, the resulting possible directions of travel can be obtained. This allows to quickly generate new rays in the correct direction when a junction is encountered. A grid of cells with a vector of directions is kept to control which cells have been visited and in which direction.
+For part two the runtime is a bit high (about 600ms), so the solution isn't very efficient but it's readable so i kept it.
 
 ## [Day 17](https://adventofcode.com/2023/day/17)
 

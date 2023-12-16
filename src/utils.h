@@ -125,6 +125,13 @@ std::ostream & operator<<(std::ostream &os, const Vector2<T> & c) {
 	return os;
 }
 
+template<typename T>
+struct Vector2Hash {
+    std::size_t operator()(const Vector2<T>& v) const noexcept {
+      return (v.x + v.y) * (v.x + v.y + 1) / 2 + v.y;
+    }
+};
+
 /**
  * Transposes a board, returns a new board
  * 
