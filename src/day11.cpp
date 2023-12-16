@@ -15,7 +15,7 @@ namespace aoc11 {
 using namespace std;
 using namespace aoc;
 
-using Position = Vector2<int64_t>;
+using Position = vec2<int64_t>;
 
 constexpr int64_t EXP_FACTOR = 100;
 

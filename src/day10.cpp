@@ -17,7 +17,7 @@ namespace aoc10 {
 using namespace std;
 using namespace aoc;
 
-using Position = Vector2<int>;
+using Position = vec2<int>;
 
 // Directions and Invalid marker
 constexpr auto 

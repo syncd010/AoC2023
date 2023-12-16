@@ -31,11 +31,11 @@ int diffsBySinglePos(const string &str1, const string &str2) {
 
 // Tries to find a reflection row on the pattern.
 // If allowSingleDiffs = true, allows for single character changes
-pair<int, Vector2<int>> findReflectionRow(const vector<string> &pattern, bool allowSingleDiffs = false) {
+pair<int, vec2<int>> findReflectionRow(const vector<string> &pattern, bool allowSingleDiffs = false) {
   int h = pattern.size();
   for (int row = 1; row < h; row++) {
     bool reflected = true;
-    Vector2 diffPos(-1, -1);
+    vec2 diffPos(-1, -1);
     // Check if rows are reflected around current one
     for (int i = 0; i < min(row, h - row); i++) {
       if (pattern[row + i] != pattern[row - i - 1]) {
@@ -45,7 +45,7 @@ pair<int, Vector2<int>> findReflectionRow(const vector<string> &pattern, bool al
           // Check if this row has a single diff
           int diffCol = diffsBySinglePos(pattern[row + i], pattern[row - i - 1]);
           if (diffCol != -1) {
-            diffPos = Vector2(diffCol, row-i-1);
+            diffPos = vec2(diffCol, row-i-1);
             continue;
           }
         }
@@ -56,7 +56,7 @@ pair<int, Vector2<int>> findReflectionRow(const vector<string> &pattern, bool al
     if (reflected && (!allowSingleDiffs || diffPos.x != -1)) 
       return make_pair(row, diffPos);
   }
-  return make_pair(-1, Vector2(-1, -1));
+  return make_pair(-1, vec2(-1, -1));
 }
 
 

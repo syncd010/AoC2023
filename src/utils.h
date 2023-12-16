@@ -89,45 +89,51 @@ constexpr auto splitStringBy(const std::string_view &str, const T &delim, bool k
  * Simple 2D position / direction encapsulation
 */
 template<typename T>
-struct Vector2 {
+struct vec2 {
   T x, y;
 
-  Vector2 operator+(const Vector2 &other) const { return Vector2{x + other.x, y + other.y}; }
-  Vector2 operator-(const Vector2 &other) const { return Vector2{x - other.x, y - other.y}; }
-  Vector2 operator*(T factor) const { return Vector2{x * factor, y * factor}; }
+  friend constexpr vec2 operator+(vec2 p, vec2 o) { return p += o; }
+  friend constexpr vec2 operator-(vec2 p, vec2 o) { return p -= o; }
+  friend constexpr vec2 operator*(vec2 p, T factor) { return p *= factor; }
 
-  bool operator==(const Vector2 &other) const { return x == other.x && y == other.y; }
-
-  /**
-   * Moves the vector by the amount specified
-   * 
-   * @param dist Distance to move
-  */
-  void moveBy(Vector2 dist) {
-    x += dist.x;
-    y += dist.y;
+  constexpr vec2 &operator+=(const vec2 &other) {
+    x += other.x; y += other.y;
+    return *this;
   }
 
-  double distanceTo(Vector2 other) {
+  constexpr vec2 &operator-=(const vec2 &other) {
+    x -= other.x; y -= other.y;
+    return *this;
+  }
+
+  constexpr vec2 &operator*=(const T factor) {
+    x *= factor; y *= factor;
+    return *this;
+  }
+
+  bool operator==(const vec2 &) const = default;
+  auto operator<=>(const vec2 &) const = default;
+
+  double distanceTo(vec2 other) {
     T dx = x - other.x, dy = y - other.y;
     return std::sqrt(dx * dx + dy * dy);
   }
 
-  T manhattanDistanceTo(Vector2 other) {
+  T manhattanDistanceTo(vec2 other) {
     T dx = x - other.x, dy = y - other.y;
     return std::abs(dx) + std::abs(dy);
   }
 };
 
 template<typename T>
-std::ostream & operator<<(std::ostream &os, const Vector2<T> & c) {
+std::ostream & operator<<(std::ostream &os, const vec2<T> & c) {
 	os << "[" << c.x << ", " << c.y << "]";
 	return os;
 }
 
 template<typename T>
-struct Vector2Hash {
-    std::size_t operator()(const Vector2<T>& v) const noexcept {
+struct vec2Hash {
+    std::size_t operator()(const vec2<T>& v) const noexcept {
       return (v.x + v.y) * (v.x + v.y + 1) / 2 + v.y;
     }
 };
@@ -171,7 +177,7 @@ constexpr bool inBounds(T val, T min, T max) {
  * @return Whether the position is inside the board
 */
 template<typename T, typename U>
-inline bool insideBoard(const std::vector<T> &board, Vector2<U> pos) {
+inline bool insideBoard(const std::vector<T> &board, vec2<U> pos) {
   U h = board.size(), w = board[0].size();
   return inBounds(pos.x, 0, w) && inBounds(pos.y, 0, h);
 }

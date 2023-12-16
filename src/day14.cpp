@@ -18,7 +18,7 @@ namespace aoc14 {
 using namespace std;
 using namespace aoc;
 
-using Position = Vector2<int>;
+using Position = vec2<int>;
 
 // Standard directions and invalid marker
 constexpr auto 
@@ -40,7 +40,7 @@ vector<string> tiltBoard(const vector<string> &board, const Position dir) {
         Position pos = Position(x, y) + dir;
         // Loop until a cube is found or end reached
         while (insideBoard(newBoard, pos) && newBoard[pos.y][pos.x] == EMPTY) {
-          pos.moveBy(dir);
+          pos += dir;
         }
         // Clear previous position, put rock on final position. Must be in sync with the loop direction
         newBoard[y][x] = EMPTY;
