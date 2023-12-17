@@ -131,10 +131,20 @@ std::ostream & operator<<(std::ostream &os, const vec2<T> & c) {
 	return os;
 }
 
+template <class T>
+inline void hash_combine(std::size_t& seed, const T& v) {
+    std::hash<T> hasher;
+    seed ^= hasher(v) + 0x9e3779b9 + (seed<<6) + (seed>>2);
+}
+
 template<typename T>
 struct vec2Hash {
     std::size_t operator()(const vec2<T>& v) const noexcept {
-      return (v.x + v.y) * (v.x + v.y + 1) / 2 + v.y;
+      size_t seed = 0;
+      hash_combine(seed, v.x);
+      hash_combine(seed, v.y);
+      return seed;
+      // return (v.x + v.y) * (v.x + v.y + 1) / 2 + v.y;
     }
 };
 

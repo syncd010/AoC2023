@@ -105,6 +105,7 @@ The solution is based on following rays through the grid, and when a junction is
 For part two the runtime is a bit high (about 600ms), so the solution isn't very efficient but it's readable so i kept it.
 
 ## [Day 17](https://adventofcode.com/2023/day/17)
+Not yest finished as it is too inefficient.
 
 ## [Day 18](https://adventofcode.com/2023/day/18)
 
