@@ -108,6 +108,7 @@ For part two the runtime is a bit high (about 600ms), so the solution isn't very
 Not yest finished as it is too inefficient.
 
 ## [Day 18](https://adventofcode.com/2023/day/18)
+It's a learn something new day. Part one was initially done similarly to day 10, though that didn't scale to part two. Spent part of the day trying to devise a way to get the interior area from a list of the vertices, but before implementing something complex i gave up and looked for clues on Reddit to check if that was the right track. Learned about [Shoelace formula](https://en.wikipedia.org/wiki/Shoelace_formula) and [Pick's theorem](https://en.wikipedia.org/wiki/Pick%27s_theorem) and also that, next time, need to look for clues earlier.
 
 ## [Day 19](https://adventofcode.com/2023/day/19)
 
