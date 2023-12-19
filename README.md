@@ -111,6 +111,11 @@ Not yest finished as it is too inefficient.
 It's a learn something new day. Part one was initially done similarly to day 10, though that didn't scale to part two. Spent part of the day trying to devise a way to get the interior area from a list of the vertices, but before implementing something complex i gave up and looked for clues on Reddit to check if that was the right track. Learned about [Shoelace formula](https://en.wikipedia.org/wiki/Shoelace_formula) and [Pick's theorem](https://en.wikipedia.org/wiki/Pick%27s_theorem) and also that, next time, need to look for clues earlier.
 
 ## [Day 19](https://adventofcode.com/2023/day/19)
+A fun and interesting day. Somewhat challenging dealing with various levels of data, but interesting.
+Parsing the input is messy but straightforward. Rules have a specific `struct` to model them, workflows are modelled as a map of workflow name to a list of its rules, parts are a map of its category to its value. Parsing the input returns the workflows a the list of parts.
+Part one is relatively straightforward: pass each part through the workflows (starting at "in") and collect the accepted parts.
+Part two is more interesting : The idea is to splice a hypercube iteratively with each rule on the workflow. This involves keeping a queue of the hypercubes yet to be completely spliced, and using the workflows to splice them step by step. Each rule in a workflow that is not final  splices the hypercube and sent to the queue for further exploration. The inverse of the hypercube continues to be processed with the next rule of the workflow. When an accepted hypercube is found, its area is calculated and added to the combinations.
+
 
 ## [Day 20](https://adventofcode.com/2023/day/20)
 

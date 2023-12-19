@@ -8,6 +8,7 @@
 #include <cmath>
 #include <vector>
 #include <ostream>
+#include <functional>
 
 namespace aoc {
 
@@ -79,6 +80,15 @@ template<typename R=std::string_view, typename T = char>
 constexpr auto splitStringBy(const std::string_view &str, const T &delim, bool keepEmptyLines = false) {
   return str
     | std::views::split(delim)
+    | std::views::filter([keepEmptyLines](auto rg) { return keepEmptyLines || !rg.empty(); })
+    | std::views::transform([](auto rg){
+          return R(rg.begin(), rg.end());
+      });
+};
+
+template<typename R=std::string_view, typename T = char>
+constexpr auto splitString(const T &delim, bool keepEmptyLines = false) {
+  return std::views::split(delim)
     | std::views::filter([keepEmptyLines](auto rg) { return keepEmptyLines || !rg.empty(); })
     | std::views::transform([](auto rg){
           return R(rg.begin(), rg.end());
@@ -205,5 +215,33 @@ inline void displayBoard(const std::vector<T> &board, const std::string_view mes
   if (!message.empty()) std::cout << message << "\n";
   for (const T &line : board) std::cout << line << "\n";
 }
+
+
+/**
+ * C++ 23 stuff not yet fully available on stdlib
+ * Different naming conventions used
+*/
+struct foldLeftFn 
+{
+    template<std::input_iterator I, std::sentinel_for<I> S, class T, class F>
+    constexpr auto operator()( I first, S last, T init, F f ) const
+    {
+        using U = std::decay_t<std::invoke_result_t<F&, T, std::iter_reference_t<I>>>;
+        if (first == last)
+            return U(std::move(init));
+        U accum = std::invoke(f, std::move(init), *first);
+        for (++first; first != last; ++first)
+            accum = std::invoke(f, std::move(accum), *first);
+        return std::move(accum);
+    }
+ 
+    template<std::ranges::input_range R, class T, class F>
+    constexpr auto operator()( R&& r, T init, F f ) const
+    {
+        return (*this)(std::ranges::begin(r), std::ranges::end(r), std::move(init), std::ref(f));
+    }
+};
+ 
+inline constexpr foldLeftFn foldLeft;
 
 #endif
