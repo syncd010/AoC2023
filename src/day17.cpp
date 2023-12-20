@@ -54,7 +54,7 @@ T greedySearch(const T &start,
     auto current = frontier.top();
     frontier.pop();
     if (isGoalFn(current)) {
-      cout << "Explored: " << count << "\n";
+      // cout << "Explored: " << count << "\n";
       return current;
     }
     for (auto next : successorsFn(current)) {
@@ -72,26 +72,16 @@ struct State {
   int straightStepsTaken;
   int cost;
 
-  // auto operator<=>(const State &other) const {
-  //   if (cost < other.cost) return -1;
-  //   if (cost > other.cost) return 1;
-  //   if (*this == other) return 0;
-  //   return -1;
-  // };
-
   // bool operator==(const State &other) const = default;
-  auto operator<=>(const State &other) const = default;
+  // auto operator<=>(const State &other) const = default;
   bool operator==(const State &other) const {
     return (position == other.position) &&
       (direction == other.direction) &&
       (straightStepsTaken == other.straightStepsTaken);
   };
-  // auto operator<(const State &other) const {
-  //   return cost < other.cost;
-  // };
-  // auto operator>(const State &other) const {
-  //   return cost > other.cost;
-  // };
+  auto operator<(const State &other) const {
+    return cost < other.cost;
+  };
 };
 
 std::ostream & operator<<(std::ostream &os, const State &s) {
@@ -106,26 +96,37 @@ constexpr auto
   SOUTH = Dir(0, 1),
   NORTH = Dir(0, -1);
 
-
-Result solvePartOne(const string &input) {
+Result solve(const string &input, int minSteps = 1, int maxSteps = 3) {
   auto grid = parseInput(input);
   auto h = grid.size(), w = grid[0].size();
 
   const auto moves = vector{EAST, WEST, SOUTH, NORTH};
 
-  auto successorsFn = [&grid, &moves](const State &state) {
+  auto successorsFn = [&grid, &moves, minSteps, maxSteps](const State &state) {
     vector<State> successors{};
 
-  // cout << "Successors of: " << state << "\n";
+    if (state.straightStepsTaken < minSteps) {
+      if (!insideBoard(grid, state.position + state.direction * (minSteps - 1))) return successors;
+      auto p = state.position;
+      int newCost = state.cost;
+      for (int i = 0; i < (minSteps - 1); i++) {
+        p += state.direction;
+        newCost += grid[p.y][p.x];
+      }
+      successors.push_back(State(p, state.direction, state.straightStepsTaken + 3, newCost));
+      return successors;
+    }
+
     for (auto d : moves) {
-      auto p = state.position + d;
-      if (!insideBoard(grid, p)) continue;
       // Can't turn back
       if (d == Dir(0, 0) - state.direction) continue;
+
+      auto p = state.position + d;
+      if (!insideBoard(grid, p)) continue;
       auto straightStepsTaken = 0;
       if (d == state.direction) {
         // Same direction, keep count of straight steps taken
-        if (state.straightStepsTaken == 3) continue;
+        if (state.straightStepsTaken == maxSteps) continue;
         straightStepsTaken = state.straightStepsTaken;
       }
       auto newState = State(p, d, ++straightStepsTaken, state.cost + grid[p.y][p.x]);
@@ -135,8 +136,8 @@ Result solvePartOne(const string &input) {
     return successors;
   };
 
-  auto isGoalFn = [h, w](const State &state) {
-    return state.position.y == h - 1 && state.position.x == w - 1;
+  auto isGoalFn = [h, w, minSteps](const State &state) {
+    return state.position.y == h - 1 && state.position.x == w - 1 && state.straightStepsTaken >= minSteps;
   };
 
   auto comparisonFn = [](const State &s1, const State &s2) {
@@ -151,56 +152,13 @@ Result solvePartOne(const string &input) {
   return min(costEast.cost, costSouth.cost);
 }
 
+
+Result solvePartOne(const string &input) {
+  return solve(input, 1, 3);
+}
+
 Result solvePartTwo(const string &input) {
-  auto grid = parseInput(input);
-  auto h = grid.size(), w = grid[0].size();
-
-  const auto moves = vector{EAST, WEST, SOUTH, NORTH};
-
-  auto successorsFn = [&grid, &moves](const State &state) {
-    vector<State> successors{};
-
-
-    if (state.straightStepsTaken < 4) {
-      auto p = state.position + state.direction;
-      if (!insideBoard(grid, p)) return successors;
-      auto newState = State(p, state.direction, state.straightStepsTaken + 1, state.cost + grid[p.y][p.x]);
-      successors.push_back(newState);
-      return successors;
-    }
-
-    for (auto d : moves) {
-      auto p = state.position + d;
-      if (!insideBoard(grid, p)) continue;
-      // Can't turn back
-      if (d == Dir(0, 0) - state.direction) continue;
-      auto straightStepsTaken = 0;
-      if (d == state.direction) {
-        // Same direction, keep count of straight steps taken
-        if (state.straightStepsTaken == 10) continue;
-        straightStepsTaken = state.straightStepsTaken;
-      }
-      auto newState = State(p, d, ++straightStepsTaken, state.cost + grid[p.y][p.x]);
-      // cout << "Adding: " << newState << "\n";
-      successors.push_back(newState);
-    }
-    return successors;
-  };
-
-  auto isGoalFn = [h, w](const State &state) {
-    return state.position.y == h - 1 && state.position.x == w - 1 && state.straightStepsTaken >= 4;
-  };
-
-  auto comparisonFn = [](const State &s1, const State &s2) {
-    // Get the minimum cost
-    return s1.cost > s2.cost;
-  };
-
-  State startEast{Pos{0, 0}, Dir{1, 0}, 1, 0};
-  State costEast = greedySearch(startEast, successorsFn, isGoalFn, comparisonFn);
-  State startSouth{Pos{0, 0}, Dir{0, 1}, 1, 0};
-  State costSouth = greedySearch(startSouth, successorsFn, isGoalFn, comparisonFn);
-  return min(costEast.cost, costSouth.cost);
+  return solve(input, 4, 10);
 }
 } // namespace aoc17
 
