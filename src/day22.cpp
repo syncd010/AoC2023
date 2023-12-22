@@ -27,7 +27,11 @@ vector<Brick> parseInput(const string &input) {
           auto v = toVector(end | splitNumbers<int>(','));
           return vec3(v[0], v[1], v[2]);
         });
-      return make_pair(*(rg.begin()), *(++rg.begin()));
+      auto v1 = *(rg.begin());
+      auto v2 = *(++rg.begin());
+      v1 = vec3(min(v1.x, v2.x), min(v1.y, v2.y), min(v1.z, v2.z));
+      v2 = vec3(max(v1.x, v2.x), max(v1.y, v2.y), max(v1.z, v2.z));
+      return make_pair(v1, v2);
      }));
 }
 
@@ -42,13 +46,14 @@ int stepDown(vector<Brick> &bricks, int ignoreBrick = -1) {
 
   for (int i = 0; i < bricks.size(); i++) {
     if (i == ignoreBrick) continue;
-    if (min(bricks[i].first.z, bricks[i].second.z) == 1) continue;
+    if (bricks[i].first.z == 1) continue;
     bool canMove = true;
-    int drop = 1;
+    constexpr int drop = 1;
     bricks[i].first.z -= drop;
     bricks[i].second.z -= drop;
 
     for (int j = i - 1; j >= 0; j--) {
+      if (bricks[i].first.z != bricks[j].second.z) continue;
       if (j == ignoreBrick) continue;
       if (intersects(bricks[i], bricks[j])) {
         canMove = false;
@@ -56,8 +61,8 @@ int stepDown(vector<Brick> &bricks, int ignoreBrick = -1) {
       }
     }
     if (!canMove) {
-      bricks[i].first.z += 1; 
-      bricks[i].second.z += 1;
+      bricks[i].first.z += drop; 
+      bricks[i].second.z += drop;
     } else {
       countMoves++;
     }
