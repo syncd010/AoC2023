@@ -150,11 +150,11 @@ inline void hash_combine(std::size_t& seed, const T& v) {
 template<typename T>
 struct vec2Hash {
     std::size_t operator()(const vec2<T>& v) const noexcept {
-      size_t seed = 0;
-      hash_combine(seed, v.x);
-      hash_combine(seed, v.y);
-      return seed;
-      // return (v.x + v.y) * (v.x + v.y + 1) / 2 + v.y;
+      // size_t seed = 0;
+      // hash_combine(seed, v.x);
+      // hash_combine(seed, v.y);
+      // return seed;
+      return (v.x + v.y) * (v.x + v.y + 1) / 2 + v.y;
     }
 };
 
@@ -246,8 +246,15 @@ inline constexpr foldLeftFn foldLeft;
 
 template <std::ranges::range R>
 constexpr auto toVector(R&& r) {
-    using elem_t = std::decay_t<std::ranges::range_value_t<R>>;
-    return std::vector<elem_t>{r.begin(), r.end()};
+  using elem_t = std::decay_t<std::ranges::range_value_t<R>>;
+  std::vector<elem_t> v;
+  if constexpr(std::ranges::sized_range<R>) {
+      v.reserve(std::ranges::size(r));
+  }
+  std::ranges::copy(r, std::back_inserter(v));
+  return v;
+  // using elem_t = std::decay_t<std::ranges::range_value_t<R>>;
+  // return std::vector<elem_t>{r.begin(), r.end()};
 }
 
 
