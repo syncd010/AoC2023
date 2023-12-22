@@ -27,6 +27,7 @@
   macro(19)  \
   macro(20)  \
   macro(21)  \
+  macro(22)  \
   // Additional days here
 
 using Result = std::variant<std::monostate, std::int64_t, std::string>;

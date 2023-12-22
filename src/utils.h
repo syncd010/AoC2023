@@ -95,6 +95,15 @@ constexpr auto splitString(const T &delim, bool keepEmptyLines = false) {
       });
 };
 
+template <typename T, typename U>
+constexpr auto splitNumbers(const U delim, int base = 10) {
+  return std::views::split(delim)
+    | std::views::filter([](auto rg) { return !rg.empty(); })
+    | std::views::transform([](auto rg) {
+      return ston<T>(std::string_view(rg.begin(), rg.end()));
+    });
+}
+
 /**
  * Simple 2D position / direction encapsulation
 */
@@ -157,6 +166,42 @@ struct vec2Hash {
       return (v.x + v.y) * (v.x + v.y + 1) / 2 + v.y;
     }
 };
+
+/**
+ * Simple 3D position / direction encapsulation
+*/
+template<typename T>
+struct vec3 {
+  T x, y, z;
+
+  friend constexpr vec3 operator+(vec3 p, vec3 o) { return p += o; }
+  friend constexpr vec3 operator-(vec3 p, vec3 o) { return p -= o; }
+  friend constexpr vec3 operator*(vec3 p, T factor) { return p *= factor; }
+
+  constexpr vec3 &operator+=(const vec3 &other) {
+    x += other.x; y += other.y; z += other.z;
+    return *this;
+  }
+
+  constexpr vec3 &operator-=(const vec3 &other) {
+    x -= other.x; y -= other.y; z -= other.z;
+    return *this;
+  }
+
+  constexpr vec3 &operator*=(const T factor) {
+    x *= factor; y *= factor; z *= factor;
+    return *this;
+  }
+
+  bool operator==(const vec3 &) const = default;
+  auto operator<=>(const vec3 &) const = default;
+};
+
+template<typename T>
+std::ostream & operator<<(std::ostream &os, const vec3<T> & c) {
+	os << "[" << c.x << ", " << c.y << ", " << c.z << "]";
+	return os;
+}
 
 /**
  * Transposes a board, returns a new board

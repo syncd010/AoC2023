@@ -130,8 +130,8 @@ What i didn't notice (because i didn't look at the real input, should've know be
 This works because the input seems to be carefully crafted for it to work... The input board is 131x131, the first "outer" tiles are reached after 65 steps (because the start in in the center), and we are asked to calculate the result after 26501365 steps. Now 26501365 - 65 = 26501300 and 26501300 / 131 = 202300, so that number of steps was carefully chosen to be when the edge of a tile is reached.
 This was the first day that i felt i couldn't solve on my own. I've looked for clues on other days, but i always saw a path to the solution - i looked for clues either because i suspected that it involved some math trickery that i didn't know about (but could find on Google, so finding it on Reddit isn't much different), like in day 18, or i was too lazy to do some particular task (but could do it with with enough effort), like in day 20. Today i felt at a loss on part two, and the solution isn't very satisfying so it was kind of frustrating. At least the code is small.
 
-
 ## [Day 22](https://adventofcode.com/2023/day/22)
+Simplified 3D tetris is a nice one. Not much to say, for now it just tries to drop down each piece one place at a time and checks for collisions. A bit inefficient, takes a couple of seconds to run, so i need to revisit this, but not today.
 
 ## [Day 23](https://adventofcode.com/2023/day/23)
 
