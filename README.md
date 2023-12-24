@@ -134,6 +134,7 @@ This was the first day that i felt i couldn't solve on my own. I've looked for c
 Simplified 3D tetris is a nice one. Not much to say, for now it just tries to drop down each piece one place at a time and checks for collisions. A bit inefficient, takes a couple of seconds to run, so i need to revisit this, but not today.
 
 ## [Day 23](https://adventofcode.com/2023/day/23)
+Nice day, though the solution is too much inefficient (about 30s). Need to optimize it further, but not now.
 
 ## [Day 24](https://adventofcode.com/2023/day/24)
 
