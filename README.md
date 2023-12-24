@@ -137,5 +137,8 @@ Simplified 3D tetris is a nice one. Not much to say, for now it just tries to dr
 Nice day, though the solution is too much inefficient (about 30s). Need to optimize it further, but not now.
 
 ## [Day 24](https://adventofcode.com/2023/day/24)
+Pure high school math today.
+For part one i calculate the equations and coded them. Each stone movement is described by `x(t) = x0 + vx*t` `and y(t) = y0 + vy*t`. From there, project to the 2D xy plane by changing the variables, getting `y(x) = y0 - (vy/vx)*x0 + (vy/vx)*x`. Equalizing 2 stones to get an equation for x (and using `s = vy/vx`): `x = (y0_b - y0_a - s_b*x0_b + s_a*x0_a) / (s_a - s_b)`. From x, get the time plugging x into the 2 original movement equations, check if both times are positive and if so, get the y.
+Part two is a big system of equations: equating the rock movement equation to the movement equations of 3 stones, we obtain 9 equations with 9 unknowns (x, y, x, vx, vy, vz, t1, t2, t3). This system can be solved by hand but it's a lot of work and error prone, better to use a tool. I just plugged the equations into Wolfram Alpha and got the result.
 
 ## [Day 25](https://adventofcode.com/2023/day/25)
