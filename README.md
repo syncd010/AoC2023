@@ -142,3 +142,4 @@ For part one i calculate the equations and coded them. Each stone movement is de
 Part two is a big system of equations: equating the rock movement equation to the movement equations of 3 stones, we obtain 9 equations with 9 unknowns (x, y, x, vx, vy, vz, t1, t2, t3). This system can be solved by hand but it's a lot of work and error prone, better to use a tool. I just plugged the equations into Wolfram Alpha and got the result.
 
 ## [Day 25](https://adventofcode.com/2023/day/25)
+And that's a wrap, with a graph theory problem. I'm no expert on graph theory, but it looks like a minimum cut problem, severely constrained, so i used [Karger's algorithm](https://en.wikipedia.org/wiki/Karger%27s_algorithm) to get the answer. For now it's extremely inefficient, will improve it later.
