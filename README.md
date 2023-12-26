@@ -30,8 +30,7 @@ This will run the 2 parts of the specified `$day`, using `$file` as input. If no
 Simple warm up. Part two is a hack, directly substituting the names of the digits in the string. Need to be careful because the names can share characters (oneigth should be 18) but it works because at most one character is shared between them.
 
 ## [Day 2](https://adventofcode.com/2023/day/2)
-These warmups are more challenging than previous years. The parsing is contrived, particularly because there are multiple layers of vectors involved.
-Anyway, still getting the hang of using C++ ranges, and today also fighting with regular expressions. The regex API doesn't seem as user-friendly as others.
+These warmups are more challenging than previous years. The parsing is contrived, particularly because there are multiple layers of vectors involved. Initially i used regex to parse the input, but the API doesn't seem as user-friendly as others and it increased the runtime, so i reverted to simple string parsing to get the runtime bellow 10ms.
 
 ## [Day 3](https://adventofcode.com/2023/day/3)
 Clearly a Sunday, as this was a hard puzzle for day 3. 

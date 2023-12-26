@@ -1,4 +1,3 @@
-#include <algorithm>
 #include <iostream>
 #include <unordered_map>
 #include <numeric>
@@ -6,8 +5,6 @@
 #include <string>
 #include <string_view>
 #include <vector>
-#include <regex>
-#include <tuple>
 
 #include "aoc.h"
 #include "utils.h"
@@ -39,13 +36,12 @@ vector<Game> parseInput(const string &input) {
       auto gameDraws = ranges::subrange(n_end + 1, lineRg.end()) // Rest of the string
         | views:: split(';')  // Split by draw separator
         | views::transform([] (auto drawRg) {   // Parse each draw, return vector<SingleDraw>
-            regex re(" (\\d+) (blue|red|green)");
-            sregex_iterator matchBegin(drawRg.begin(), drawRg.end(), re), matchEnd{};
-            vector<SingleDraw> res{};
-            for (auto it = matchBegin; it != matchEnd; it++) {
-              res.push_back(SingleDraw(stoi((*it)[1]), (*it)[2]));
-            }
-            return res;
+          return toVector(drawRg 
+            | views:: split(',')  // Split by color separator
+            | views::transform([](auto singleDrawRg) {
+              auto s = toVector(singleDrawRg | splitString<string>(' '));
+              return SingleDraw(stoi(s[0]), s[1]);
+            }));
         });
         return Game(gameId, vector(gameDraws.begin(), gameDraws.end()));
     });

@@ -294,7 +294,7 @@ struct foldLeftFn
 inline constexpr foldLeftFn foldLeft;
 
 template <std::ranges::range R>
-constexpr auto toVector(R&& r) {
+constexpr std::vector<std::decay_t<std::ranges::range_value_t<R>>> toVector(R&& r) {
   using elem_t = std::decay_t<std::ranges::range_value_t<R>>;
   std::vector<elem_t> v;
   if constexpr(std::ranges::sized_range<R>) {
