@@ -24,10 +24,7 @@ struct AlmanacMap {
 };
 
 tuple<vector<int64_t>, vector<AlmanacMap>> parseInput(const string &input) {
-  auto lines = input
-        | views::split('\n')
-        | views::filter([](auto rg) { return !rg.empty(); })
-        | views::transform([](auto rg){ return string_view(rg.begin(), rg.end()); });
+  auto lines = input | splitString('\n');
 
   auto seedsLine = (*lines.begin()).substr(6);
   vector<int64_t> seeds = splitStringToNumbers<int64_t>(seedsLine, ' ');
@@ -47,9 +44,7 @@ tuple<vector<int64_t>, vector<AlmanacMap>> parseInput(const string &input) {
 }
 
 Result solvePartOne(const string &input) {
-  auto parsed = parseInput(input);
-  auto seeds = get<0>(parsed);
-  auto allMaps = get<1>(parsed);
+  auto [seeds, allMaps] = parseInput(input);
 
   vector<int64_t> mappedSeeds{};
   for (auto seed : seeds) {
@@ -70,9 +65,7 @@ Result solvePartOne(const string &input) {
 }
 
 Result solvePartTwo(const string &input) {
-  auto parsed = parseInput(input);
-  auto auxSeeds = get<0>(parsed);
-  auto allMaps = get<1>(parsed);
+  auto [auxSeeds, allMaps] = parseInput(input);
 
   vector<tuple<int64_t, int64_t>> seeds, mappedSeeds{};
   // Join seeds in pairs [start, len)

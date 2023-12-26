@@ -17,12 +17,13 @@ using namespace aoc;
 
 // Returns a range of how many numbers are winners for each card
 auto parseInput(const string &input) {
-  return splitStringBy(input, '\n')     // Split lines
+  return input 
+    | splitString('\n')
     | views::transform([](string_view str) {
       // Get the winner and card numbers
       int start = str.find(':') + 1, mid = str.find('|', start);
-      auto winners = splitStringToNumbers<int>(str.substr(start, mid - start), ' ');
-      auto numbers = splitStringToNumbers<int>(str.substr(mid + 1), ' ');
+      auto winners = toVector(str.substr(start, mid - start) | splitNumbers<int>(' '));
+      auto numbers = str.substr(mid + 1) | splitNumbers<int>(' ');
       // Intersect numbers and winners
       ranges::sort(winners);  // For efficiency
       return accumulate(numbers.begin(), numbers.end(), 0, [&winners](int prev, int n) {
@@ -32,22 +33,20 @@ auto parseInput(const string &input) {
 }
 
 Result solvePartOne(const string &input) {
-  auto nums = parseInput(input)
-    | views::common;
-  return accumulate(nums.begin(), nums.end(), 0, [](int prev, int exp) {
+  auto winnerCounts = parseInput(input);
+  return foldLeft(winnerCounts, 0, [](int prev, int exp) {
     // Rules for part one
-    return prev + ((exp == 0) ? 0 : pow(2, exp - 1));
+    return prev + ((exp == 0) ? 0 : (int64_t)pow(2, exp - 1));
   });
 }
 
 Result solvePartTwo(const string &input) {
-  auto nums_rg = parseInput(input);
-  vector nums(nums_rg.begin(), nums_rg.end());
-  vector cards(distance(nums.begin(), nums.end()), 1);
+  auto winnerCounts = toVector(parseInput(input));
+  vector cards(winnerCounts.size(), 1);
 
   // Propagate numbers to following cards
-  for (int i = 0; i < nums.size(); i++) {
-    for (int j = 0; j < nums[i] && i + 1 + j < cards.size(); j++) {
+  for (int i = 0; i < winnerCounts.size(); i++) {
+    for (int j = 0; j < winnerCounts[i] && i + 1 + j < cards.size(); j++) {
       cards[i + 1 + j] += cards[i];
     }
   }

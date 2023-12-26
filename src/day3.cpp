@@ -14,24 +14,16 @@ using namespace std;
 using namespace aoc;
 
 vector<int> findNums(const string &input, bool partTwoRules = false) {
-  auto parsed = input
-    | views::split('\n')
-    | views::transform([](auto rg) {
-      return string(rg.begin(), rg.end());
-    });
-  auto engine = vector(parsed.begin(), parsed.end());
-
+  auto engine = toVector(input | splitString('\n'));
   int w = engine[0].size(), h = engine.size();
   vector<int> res{};
 
   for (int y = 0; y < h; y++) {
     for (int x = 0; x < w; x++) {
-      if (isdigit(engine[y][x]) || 
-          engine[y][x] == '.' || 
-          (partTwoRules && engine[y][x] != '*')) 
+      if (isdigit(engine[y][x]) || engine[y][x] == '.' || (partTwoRules && engine[y][x] != '*'))
         continue;
 
-      // Convolution with adjacent cells, finding values
+      // Visit adjacent cells, finding values
       vector<int> adjacent{};
       for (int dy = -1; dy <= 1; dy++) {
         if (y+dy < 0 || y + dy >= h) continue;
@@ -63,6 +55,7 @@ Result solvePartOne(const string &input) {
 
 Result solvePartTwo(const string &input) {
   auto nums = findNums(input, true);
+  // Accumulate pairs
   int res = 0;
   for (int i = 0; i < nums.size(); i += 2) {
     res += nums[i] * nums[i+1];
