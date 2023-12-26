@@ -37,7 +37,7 @@ vector<tuple<string, Result, Result>> testFiles{
     {"./data/input22Test", 5, 7},
     {"./data/input23Test", 94, 154},
     {"./data/input24Test", 0, 886858737029295},
-    {"./data/input25Test", 54, monostate()},
+    {"./data/input25Test", 54, 54},
 };
 
 vector<tuple<string, Result, Result>> dataFiles{
@@ -65,7 +65,7 @@ vector<tuple<string, Result, Result>> dataFiles{
     {"./data/input22", 398, 70727},
     {"./data/input23", 2222, 6590},
     {"./data/input24", 18098, 886858737029295},
-    {"./data/input25", 532891, monostate()},
+    {"./data/input25", 532891, 532891},
 };
 
 string readFile(const string &filePath) {
