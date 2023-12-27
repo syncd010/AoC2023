@@ -22,11 +22,11 @@ auto parseInput(const string &input) {
     | views::transform([](string_view str) {
       // Get the winner and card numbers
       int start = str.find(':') + 1, mid = str.find('|', start);
-      auto winners = toVector(str.substr(start, mid - start) | splitNumbers<int>(' '));
-      auto numbers = str.substr(mid + 1) | splitNumbers<int>(' ');
+      auto winners = toVector(str.substr(start, mid - start) | splitNumbers(' '));
+      auto numbers = toVector(str.substr(mid + 1) | splitNumbers(' '));
       // Intersect numbers and winners
-      ranges::sort(winners);  // For efficiency
-      return accumulate(numbers.begin(), numbers.end(), 0, [&winners](int prev, int n) {
+      ranges::sort(winners);
+      return foldLeft(numbers, 0, [&winners](int prev, int n) {
         return (ranges::binary_search(winners, n)) ? prev + 1 : prev;
       });
     });

@@ -61,14 +61,14 @@ int main(const int argc, const char *const argv[]) {
     auto t1 = chrono::high_resolution_clock::now();
     Result res = solveFunc(input);
     auto t2 = chrono::high_resolution_clock::now();
-    auto ms = duration_cast<chrono::milliseconds>(t2 - t1);
+    auto ms = (double)duration_cast<chrono::microseconds>(t2 - t1).count() / 1000;
 
     if (holds_alternative<monostate>(res)) {
       cout << partDesc << ": Didn't return a value\n";
     } else if (holds_alternative<string>(res)) {
-      cout << format("{} ({}): {}\n", partDesc, ms, get<string>(res));
+      cout << format("{} ({:.2f}ms): {}\n", partDesc, ms, get<string>(res));
     } else if (holds_alternative<int64_t>(res)) {
-      cout << format("{} ({}): {}\n", partDesc, ms, get<int64_t>(res));
+      cout << format("{} ({:.2f}ms): {}\n", partDesc, ms, get<int64_t>(res));
     }
   };
 

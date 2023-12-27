@@ -1,4 +1,3 @@
-#include <algorithm>
 #include <iostream>
 #include <map>
 #include <numeric>
@@ -6,7 +5,7 @@
 #include <string>
 #include <string_view>
 #include <vector>
-#include <tuple>
+#include <utility>
 #include <cstdint>
 
 #include "aoc.h"
@@ -23,54 +22,51 @@ struct AlmanacMap {
   vector<vector<int64_t>> mappings;
 };
 
-tuple<vector<int64_t>, vector<AlmanacMap>> parseInput(const string &input) {
+pair<vector<int64_t>, vector<AlmanacMap>> parseInput(const string &input) {
   auto lines = input | splitString('\n');
-
-  auto seedsLine = (*lines.begin()).substr(6);
-  vector<int64_t> seeds = splitStringToNumbers<int64_t>(seedsLine, ' ');
+  auto seeds = toVector(lines.front().substr(6) | splitNumbers<int64_t>(' '));
 
   vector<AlmanacMap> allMaps{};
   for (auto l : lines | views::drop(1)) {
     size_t tokenPos = l.find(" map:");
     if (tokenPos != string::npos) {
-      auto newMap = AlmanacMap(string_view(l.substr(0, tokenPos)), {});
+      auto newMap = AlmanacMap(l.substr(0, tokenPos), {});
       allMaps.push_back(newMap);
     } else {
-      auto newMappings = splitStringToNumbers<int64_t>(l, ' ');
+      auto newMappings = toVector(l | splitNumbers<int64_t>(' '));
       allMaps.back().mappings.push_back(newMappings);
     }
   }
-  return make_tuple(seeds, allMaps);
+  return make_pair(seeds, allMaps);
 }
 
 Result solvePartOne(const string &input) {
   auto [seeds, allMaps] = parseInput(input);
 
-  vector<int64_t> mappedSeeds{};
-  for (auto seed : seeds) {
-    // Pass each seed through the maps, converting it
-    for (auto singleMap : allMaps) {
-      for (auto m : singleMap.mappings) {
-        int64_t start = m[1], len = m[2], end = start + len, convert = m[0];
-        if (seed >= start && seed < end) {
-          seed += convert - start;
-          break;
+  // Pass each seed through the maps, converting it
+  auto mappedSeeds = seeds | views::transform([&allMaps](auto seed) {
+      for (auto singleMap : allMaps) {
+        for (auto m : singleMap.mappings) {
+          int64_t start = m[1], len = m[2], end = start + len, convert = m[0];
+          if (seed >= start && seed < end) {
+            seed += convert - start;
+            break;
+          }
         }
       }
-    }
-    mappedSeeds.push_back(seed);
-  }
+      return seed;
+    });
 
-  return accumulate(mappedSeeds.begin(), mappedSeeds.end(), mappedSeeds.front(), ranges::min);
+  return foldLeft(mappedSeeds, mappedSeeds.front(), ranges::min);
 }
 
 Result solvePartTwo(const string &input) {
   auto [auxSeeds, allMaps] = parseInput(input);
 
-  vector<tuple<int64_t, int64_t>> seeds, mappedSeeds{};
+  vector<pair<int64_t, int64_t>> seeds, mappedSeeds{};
   // Join seeds in pairs [start, len)
   for (int i = 0; i < auxSeeds.size(); i += 2) {
-    seeds.push_back(make_tuple(auxSeeds[i], auxSeeds[i+1]));
+    seeds.push_back(make_pair(auxSeeds[i], auxSeeds[i+1]));
   }
 
   // Iterate over maps now
@@ -80,28 +76,25 @@ Result solvePartTwo(const string &input) {
     while (!seeds.empty()) {
       auto newSeed = seeds.back();
       seeds.pop_back();
-      int64_t seedStart = get<0>(newSeed), seedLen = get<1>(newSeed), seedEnd = seedStart + seedLen;
+      auto [seedStart, seedLen] = newSeed;
+      auto seedEnd = seedStart + seedLen;
 
       // Convert a single seed. If necessary, partition it and queue the segments not converted
       for (auto m : singleMap.mappings) {
-        int64_t mapStart = m[1], mapLen = m[2], mapEnd = mapStart + mapLen, mapConvert = m[0];
+        auto mapStart = m[1], mapLen = m[2], mapEnd = mapStart + mapLen, mapConvert = m[0];
         if (seedStart < mapStart && seedEnd > mapStart) {
           // Partition first segment and queue it, convert middle segment
-          seeds.push_back(make_tuple(seedStart, mapStart - seedStart));
-          newSeed = make_tuple(mapConvert, min(mapLen, seedEnd - mapStart));
+          seeds.push_back(make_pair(seedStart, mapStart - seedStart));
+          newSeed = make_pair(mapConvert, min(mapLen, seedEnd - mapStart));
           // If final segment exists, queue it
-          if (seedEnd > mapEnd) {
-            seeds.push_back(make_tuple(mapEnd, seedEnd - mapEnd));
-          }
+          if (seedEnd > mapEnd) seeds.push_back(make_pair(mapEnd, seedEnd - mapEnd));
           break;
         }
 
         if (seedStart >= mapStart && seedStart < mapEnd) {
           // Convert first segment and if second segment exists, queue it
-          newSeed = make_tuple(mapConvert + seedStart - mapStart, min(seedLen, mapEnd - seedStart));
-          if (seedEnd > mapEnd) {
-            seeds.push_back(make_tuple(mapEnd, seedEnd - mapEnd));
-          }
+          newSeed = make_pair(mapConvert + seedStart - mapStart, min(seedLen, mapEnd - seedStart));
+          if (seedEnd > mapEnd) seeds.push_back(make_pair(mapEnd, seedEnd - mapEnd));
           break;
         }
       }
@@ -112,7 +105,7 @@ Result solvePartTwo(const string &input) {
     swap(seeds, mappedSeeds);
   }
 
-  return accumulate(seeds.begin(), seeds.end(), get<0>(seeds.front()), [](int64_t m, tuple<int64_t, int64_t> seed) {
+  return foldLeft(seeds, get<0>(seeds.front()), [](auto m, auto seed) {
     return min(m, get<0>(seed));
   });
 

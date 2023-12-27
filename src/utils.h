@@ -76,7 +76,7 @@ std::vector<T> splitStringToNumbers(const std::string_view str, const U delim, i
  * @param delim delimiter to use
  * @return Range with string splits, each one converted to string
 */
-template<typename R=std::string_view, typename T = char>
+template<typename R = std::string_view, typename T = char>
 constexpr auto splitStringBy(const std::string_view &str, const T &delim, bool keepEmptyLines = false) {
   return str
     | std::views::split(delim)
@@ -95,7 +95,7 @@ constexpr auto splitString(const T &delim, bool keepEmptyLines = false) {
       });
 };
 
-template <typename T, typename U>
+template <typename T = int, typename U = char>
 constexpr auto splitNumbers(const U delim, int base = 10) {
   return std::views::split(delim)
     | std::views::filter([](auto rg) { return !rg.empty(); })
@@ -294,7 +294,7 @@ struct foldLeftFn
 inline constexpr foldLeftFn foldLeft;
 
 template <std::ranges::range R>
-constexpr std::vector<std::decay_t<std::ranges::range_value_t<R>>> toVector(R&& r) {
+constexpr auto toVector(R&& r) -> std::vector<std::decay_t<std::ranges::range_value_t<R>>> {
   using elem_t = std::decay_t<std::ranges::range_value_t<R>>;
   std::vector<elem_t> v;
   if constexpr(std::ranges::sized_range<R>) {

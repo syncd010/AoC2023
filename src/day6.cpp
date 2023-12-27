@@ -17,11 +17,11 @@ using namespace std;
 using namespace aoc;
 
 Result solvePartOne(const string &input) {
-  auto parsed = splitStringBy(input, '\n')
+  auto params = toVector(input 
+    | splitString('\n')
     | views::transform([](auto line) {
-      return splitStringToNumbers<int>(line.substr(line.find(":")+1), ' ');
-    });
-  auto params = vector(parsed.begin(), parsed.end());
+      return toVector(line.substr(line.find(":") + 1) | splitNumbers(' '));
+    }));
 
   // Distance is given by d(t) = t(T-t), so the solution is d(t) > D, with T 
   // and D given in the input. Apply quadratic formula to get (minT, maxT)
@@ -38,12 +38,12 @@ Result solvePartOne(const string &input) {
 }
 
 Result solvePartTwo(const string &input) {
-  auto parsed = splitStringBy(input, '\n')
+  auto params = toVector(input 
+    | splitString('\n')
     | views::transform([](auto line) {
       auto lineNumbers = line | views::filter(::isdigit);
-      return stol(string(lineNumbers.begin(), lineNumbers.end()));
-    });
-  auto params = vector(parsed.begin(), parsed.end());
+      return ston<int64_t>(string(lineNumbers.begin(), lineNumbers.end()));
+    }));
   auto T = params[0], D = params[1];
   auto minT = (T - sqrt(T*T - 4*D)) / 2,
     maxT = (T + sqrt(T*T - 4*D)) / 2;

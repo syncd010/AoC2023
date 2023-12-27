@@ -24,7 +24,7 @@ vector<Brick> parseInput(const string &input) {
       auto rg = line 
         | splitString('~')
         | views::transform([](string_view end) {
-          auto v = toVector(end | splitNumbers<int>(','));
+          auto v = toVector(end | splitNumbers(','));
           return vec3(v[0], v[1], v[2]);
         });
       auto v1 = *(rg.begin());
