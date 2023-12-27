@@ -38,8 +38,9 @@ int64_t nextInSequence(const vector<int64_t> &sequence) {
 
 // Parse input to lines of vector of numbers
 auto parseInput(const string &input) {
-  return splitStringBy(input, '\n') 
-    | views::transform([](string_view s) { return splitStringToNumbers<int64_t>(s, ' '); });
+  return input 
+    | splitString('\n')
+    | views::transform([](auto s) { return toVector(s | splitNumbers<int64_t>(' ')); });
 }
 
 Result solvePartOne(const string &input) {
@@ -49,6 +50,7 @@ Result solvePartOne(const string &input) {
 }
 
 Result solvePartTwo(const string &input) {
+  // Same as part one with input number reversed
   auto rg = parseInput(input)
     | views::transform([](const vector<int64_t> &sequence) { 
       return nextInSequence(vector(sequence.rbegin(), sequence.rend()));

@@ -61,10 +61,10 @@ pair<int, vec2<int>> findReflectionRow(const vector<string> &pattern, bool allow
 
 
 Result solve(const string &input, bool allowSingleDiffs = false) {
-  auto rg = splitStringBy<string_view, string>(input, "\n\n")
+  auto rg = input 
+    | splitString<string_view, string>("\n\n")
     | views::transform([](auto pattern) {
-        auto splits = splitStringBy<string>(pattern, '\n');
-        return vector(splits.begin(), splits.end());
+        return toVector(pattern | splitString<string>('\n'));
       })
     | views::transform([allowSingleDiffs](auto pattern) {
         auto [row, _ignore1] = findReflectionRow(pattern, allowSingleDiffs);

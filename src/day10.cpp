@@ -17,36 +17,23 @@ namespace aoc10 {
 using namespace std;
 using namespace aoc;
 
-using Position = vec2<int>;
+using Pos = vec2<int>;
+using Dir = vec2<int>;
 
 // Directions and Invalid marker
 constexpr auto 
-  NORTH = Position(0, -1),
-  SOUTH = Position(0, 1),
-  EAST = Position(-1, 0),
-  WEST = Position(1, 0),
-  INVALID = Position(-1, -1);
+  NORTH = Dir(0, -1),
+  SOUTH = Dir(0, 1),
+  EAST = Dir(-1, 0),
+  WEST = Dir(1, 0),
+  INVALID = Dir(-1, -1);
 
-// Inverts a position, useful for entry/exit switches on cells
-inline Position rotate180(Position &pos) { return Position(pos.x * -1, pos.y * -1); }
+// Inverts a direction, useful for entry/exit switches on cells
+inline Dir rotate180(const Dir &pos) { return Dir(pos.x * -1, pos.y * -1); }
 
-// Returns the Start 'S' position on the maze
-Position findStartPos(const auto &maze) {
-  for (int y = 0; y < maze.size(); y++) {
-    for (int x = 0; x < maze[y].size(); x++) {
-      if (maze[y][x] == 'S') {
-        return Position{x, y};
-      }
-    }
-  }
-  return INVALID;
-}
-
-// Finds the biggest loop on the maze
-vector<Position> findMaxLoop(const auto &maze) {
-  const vector<Position> dirs{ EAST, WEST, NORTH, SOUTH };
-  // Exit points for each cell type
-  const unordered_map<char, pair<Position, Position>> exits = {
+// Exit points for each cell type
+inline unordered_map<char, pair<Dir, Dir>> getExits() {
+  return {
     {'|', { NORTH, SOUTH} },
     {'-', { EAST, WEST} },
     {'J', { EAST, NORTH} },
@@ -54,9 +41,28 @@ vector<Position> findMaxLoop(const auto &maze) {
     {'F', { WEST, SOUTH} },
     {'7', { EAST, SOUTH} },
   };
+}
 
-  Position startPos = findStartPos(maze);
-  vector<Position> maxLoop{};
+
+// Returns the Start 'S' position on the maze
+Pos findStartPos(const auto &maze) {
+  for (int y = 0; y < maze.size(); y++) {
+    for (int x = 0; x < maze[y].size(); x++) {
+      if (maze[y][x] == 'S') {
+        return Pos{x, y};
+      }
+    }
+  }
+  return INVALID;
+}
+
+// Finds the biggest loop on the maze
+vector<Pos> findMaxLoop(const auto &maze) {
+  const vector<Dir> dirs{ EAST, WEST, NORTH, SOUTH };
+  const auto exits = getExits();
+
+  Pos startPos = findStartPos(maze);
+  vector<Pos> maxLoop{};
   // Try each direction from the start position
   for (auto d : dirs) {
     auto entryDir = rotate180(d);
@@ -64,14 +70,14 @@ vector<Position> findMaxLoop(const auto &maze) {
     if (!insideBoard(maze, currPos)) continue;
 
     // Follow maze until returning to start position
-    vector<Position> currLoop{currPos};
+    vector<Pos> currLoop{currPos};
     while (currPos != startPos) {
       // Handle dead ends '.'
       if (!exits.contains(maze[currPos.y][currPos.x])) break;
 
-      const pair<Position, Position> &dirs = exits.at(maze[currPos.y][currPos.x]);
+      const pair<Dir, Dir> &dirs = exits.at(maze[currPos.y][currPos.x]);
       // Exit dir is the opposite of entry dir
-      Position exitDir = 
+      Dir exitDir = 
         (entryDir == dirs.first) ? dirs.second : 
           (entryDir == dirs.second) ? dirs.first : INVALID;
       // Break if no suitable exit found, this cell isn't a continuation of the previous one
@@ -93,18 +99,14 @@ vector<Position> findMaxLoop(const auto &maze) {
 }
 
 Result solvePartOne(const string &input) {
-  auto rg = splitStringBy<string>(input, '\n');
-  auto maze = vector(rg.begin(), rg.end());
-
+  auto maze = toVector(input | splitString('\n'));
   auto maxLoop = findMaxLoop(maze);
   return (int64_t)ceil(maxLoop.size() / 2);
 }
 
 
 Result solvePartTwo(const string &input) {
-  auto rg = splitStringBy<string>(input, '\n');
-  auto maze = vector(rg.begin(), rg.end());
-
+  auto maze = toVector(input | splitString('\n'));
   auto maxLoop = findMaxLoop(maze);
   if (maxLoop.size() == 0) return monostate();
 
@@ -116,14 +118,7 @@ Result solvePartTwo(const string &input) {
   }
 
   // Deduce the start position character
-  const unordered_map<char, pair<Position, Position>> exits = {
-    {'|', { NORTH, SOUTH} },
-    {'-', { EAST, WEST} },
-    {'J', { EAST, NORTH} },
-    {'L', { WEST, NORTH} },
-    {'F', { WEST, SOUTH} },
-    {'7', { EAST, SOUTH} },
-  };
+  const auto exits = getExits();
   auto startPos = maxLoop.back();
   auto startExitDirs = make_pair(maxLoop[maxLoop.size() - 2] - startPos, maxLoop.front() - startPos);
   char startChar;

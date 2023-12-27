@@ -18,45 +18,65 @@ namespace aoc14 {
 using namespace std;
 using namespace aoc;
 
-using Position = vec2<int>;
+using Dir = vec2<int>;
+using Pos = vec2<int>;
 
 // Standard directions and invalid marker
 constexpr auto 
-  NORTH = Position(0, -1),
-  SOUTH = Position(0, 1),
-  EAST = Position(1, 0),
-  WEST = Position(-1, 0);
+  NORTH = Dir(0, -1),
+  SOUTH = Dir(0, 1),
+  EAST = Dir(1, 0),
+  WEST = Dir(-1, 0);
 
 constexpr char ROCK = 'O', CUBE = '#', EMPTY = '.';
 
-vector<string> tiltBoard(const vector<string> &board, const Position dir) {
+vector<string> tiltBoard(vector<string> board, const Dir dir) {
   int h = board.size(), w = board[0].size();
-  auto newBoard = board;
+  bool tiltHorizontal = (dir.y == 0);
 
   // Loop according to dir: starting from the start or end, so that we don't overwrite positions
-  for (int y = (dir.y == 1) ? h - 1 : 0; y >= 0 && y < h ; y += (dir.y == 1) ? -1 : 1) {
-    for (int x = (dir.x == 1) ? w - 1: 0; x >= 0 && x < w ; x += (dir.x == 1) ? -1 : 1) {
-      if (newBoard[y][x] == ROCK) {
-        Position pos = Position(x, y) + dir;
-        // Loop until a cube is found or end reached
-        while (insideBoard(newBoard, pos) && newBoard[pos.y][pos.x] == EMPTY) {
-          pos += dir;
-        }
-        // Clear previous position, put rock on final position. Must be in sync with the loop direction
-        newBoard[y][x] = EMPTY;
-        newBoard[pos.y - dir.y][pos.x - dir.x] = ROCK;
+  int dy = (dir.y == 1) ? -1 : 1, dx = (dir.x == 1) ? -1 : 1;
+  int sy = (dir.y == 1) ? h - 2 : 1, sx = (dir.x == 1) ? w - 2: 1;
+  // Save the last empty position for each row or column
+  vector<Pos> lastEmpty(tiltHorizontal ? h : w);
+  for (int i = 0; i < lastEmpty.size(); i++) {
+    lastEmpty[i] = tiltHorizontal ? Pos(sx, i) : Pos(i, sy);
+  }
+  // Loop up/down
+  for (int y = sy; y >= 0 && y < h; y += dy) {
+    // Loop left/right
+    for (int x = sx; x >= 0 && x < w; x += dx) {
+      int emptyIdx = tiltHorizontal ? y : x;
+      if (board[y][x] == CUBE) {
+        // Update last empty position
+        lastEmpty[emptyIdx].y = y - dir.y;
+        lastEmpty[emptyIdx].x = x - dir.x;
+      } else if (board[y][x] == ROCK) {
+        // Clear and place rock on last empty position
+        board[y][x] = EMPTY;
+        board[lastEmpty[emptyIdx].y][lastEmpty[emptyIdx].x] = ROCK;
+        lastEmpty[emptyIdx] -= dir;
       }
+
+      // if (board[y][x] == ROCK) {
+      //   Pos pos = Pos(x, y) + dir;
+      //   // Loop until a cube is found or end reached
+      //   while (board[pos.y][pos.x] == EMPTY) pos += dir;
+      //   // Clear previous position, put rock on final position. Must be in sync with the loop direction
+      //   board[y][x] = EMPTY;
+      //   board[pos.y - dir.y][pos.x - dir.x] = ROCK;
+      // }
     }
   }
-  return newBoard;
+  return board;
 }
 
 int64_t scoreBoard(const auto &board) {
-  int h = board.size(), w = board[0].size();  
+  int h = board.size() - 2, w = board[0].size() - 2;
   int64_t res = 0;
   for (int y = 0; y < h; y++) {
     for (int x = 0; x < w; x++) {
-      res += (board[y][x] == ROCK) * (h - y);
+      res += (board[y+1][x+1] == ROCK) * (h - y);
     }
   }
   return res;
@@ -69,27 +89,36 @@ inline string flattenBoard(const auto &board) {
   return flattened.str();
 }
 
-Result solvePartOne(const string &input) {
-  auto rg = splitStringBy<string>(input, '\n');
-  auto board = vector(rg.begin(), rg.end());
+auto surroundBoard(const auto &board) {
+  size_t h = board.size(), w = board[0].size();  
+  vector<string> newBoard{h + 2, string(w + 2, '#')};
+  for (int y = 0; y < h; y++) {
+    for (int x = 0; x < w; x++) {
+      newBoard[y+1][x+1]= board[y][x];
+    }
+  }
+  return newBoard;
+}
 
+Result solvePartOne(const string &input) {
+  auto board = surroundBoard(toVector(input | splitString<string>('\n')));
   return scoreBoard(tiltBoard(board, NORTH));
 }
 
-// Cache of boards and the loop index that generated them
-static unordered_map<string, int>cache;
-
 Result solvePartTwo(const string &input) {
-  auto rg = splitStringBy<string>(input, '\n');
-  auto board = vector(rg.begin(), rg.end());
+  auto board = surroundBoard(toVector(input | splitString<string>('\n')));
+  // Cache of boards and the loop index that generated them
+  unordered_map<string, int>cache;
 
-  vector<Position> dirs{NORTH, WEST, SOUTH, EAST};
-  int64_t steps = 1000000000 * dirs.size();
+  const vector<Dir> dirs{NORTH, WEST, SOUTH, EAST};
+  const int sz = dirs.size();
+  int64_t steps = (int64_t)1000000000 * sz;
   bool cycleFound = false;
-  for (int64_t i = 0, cycleIdx = 0; i < steps; i++, cycleIdx = (cycleIdx + 1) % dirs.size()) {
-    board = tiltBoard(board, dirs[cycleIdx]);
+  string key;
+  for (int64_t i = 0; i < steps; i++) {
+    board = tiltBoard(board, dirs[i % sz]);
     if (cycleFound) continue;   // We're just looping on the remainder steps
-    auto key = flattenBoard(board);
+    key = flattenBoard(board);
     if (cache.contains(key)) {  // Cycle found, increase counter to remaining steps
       cycleFound = true;
       i = steps - (steps - cache[key]) % (i - cache[key]);

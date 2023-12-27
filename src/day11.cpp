@@ -15,7 +15,7 @@ namespace aoc11 {
 using namespace std;
 using namespace aoc;
 
-using Position = vec2<int64_t>;
+using Pos = vec2<int64_t>;
 
 constexpr int64_t EXP_FACTOR = 100;
 
@@ -30,29 +30,29 @@ vector<int64_t> findEmptyRows(const auto &board) {
 }
 
 Result solve(const string &input, int64_t expandFactor = 1) {
-  auto rg = splitStringBy<string>(input, '\n');
-  auto board = vector(rg.begin(), rg.end());
+  auto board = toVector(input | splitString('\n'));
   size_t h = board.size(), w = board[0].size();
-
   // Find empty rows and columns
-  vector<int64_t> emptyRows = findEmptyRows(board), emptyCols = findEmptyRows(transposeBoard(board));
+  vector<int64_t> emptyRows = findEmptyRows(board), 
+                  emptyCols = findEmptyRows(transposeBoard(board));
 
   // Find positions
-  vector<Position> positions{};
+  vector<Pos> positions{};
   for (size_t y = 0; y < h; y++) {
     for (size_t x = 0; x < w; x++) {
-      if (board[y][x] == '#') positions.push_back(Position(x, y));
+      if (board[y][x] == '#') positions.push_back(Pos(x, y));
     }
   }
 
   // Expand positions with the empty rows and columns
-  auto expandedPositions = positions
+  // Note: making this a vector instead of a range is 10x faster later on
+  auto expandedPositions = toVector(positions
     | views::transform([&emptyRows, &emptyCols, expandFactor](auto p) {
       auto expanded = p;
       for (auto n: emptyRows) if (p.y > n) expanded.y += expandFactor;
       for (auto n: emptyCols) if (p.x > n) expanded.x += expandFactor;
       return expanded;
-    });
+    }));
 
   // Calculate Manhattan Distance between pairs of positions
   int64_t res = 0;

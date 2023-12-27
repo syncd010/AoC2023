@@ -25,7 +25,7 @@ inline int64_t cantorPairingFunction(int64_t k1, int64_t k2) {
 }
 
 // Calculates the possible combinations starting on recPos and groupPos
-int64_t calcCombinations(string_view record, vector<int> groups, int recPos = 0, int groupPos = 0) {
+int64_t calcCombinations(string_view record, const vector<int> &groups, int recPos = 0, int groupPos = 0) {
   int thisGroup = groups[groupPos];
   // Estimate the space needed at the end for the remaining groups
   int spacer = accumulate(groups.begin() + groupPos, groups.end(), 0) + groups.size() - 1 - groupPos;
@@ -59,12 +59,17 @@ int64_t calcCombinations(string_view record, vector<int> groups, int recPos = 0,
   return combinations;
 }
 
-Result solvePartOne(const string &input) {
-  auto rg = splitStringBy(input, '\n')
+auto parseInput(const string &input) {
+  return input
+    | splitString('\n')
     | views::transform([](string_view str) {
       size_t sep = str.find(' ');
-      return make_pair(str.substr(0, sep), splitStringToNumbers<int>(str.substr(sep + 1), ','));
-    })
+      return make_pair(str.substr(0, sep), toVector(str.substr(sep + 1) | splitNumbers(',')));
+    });
+}
+
+Result solvePartOne(const string &input) {
+  auto rg = parseInput(input)
     | views::transform([](auto pair) {
       cache.clear();    // Clear cache on each line
       return calcCombinations(pair.first, pair.second);
@@ -74,19 +79,14 @@ Result solvePartOne(const string &input) {
 }
 
 Result solvePartTwo(const string &input) {
-  auto rg = splitStringBy(input, '\n')
-    | views::transform([](string_view str) {
-      size_t sep = str.find(' ');
-      return make_pair(str.substr(0, sep), splitStringToNumbers<int>(str.substr(sep + 1), ','));
-    })
+  auto rg = parseInput(input)
     | views::transform([](auto pair) {
       cache.clear();    // Clear cache on each line
       // Expand input by 5
       string records{pair.first};
       vector<int> groups{pair.second};
       for (int i = 0; i < 4; i++) {
-        records.append("?");
-        records.append(pair.first);
+        records.append("?").append(pair.first);
         groups.insert(groups.end(), pair.second.begin(), pair.second.end());
       }
 

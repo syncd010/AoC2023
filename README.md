@@ -30,7 +30,7 @@ This will run the 2 parts of the specified `$day`, using `$file` as input. If no
 Simple warm up. Part two is a hack, directly substituting the names of the digits in the string. Need to be careful because the names can share characters (oneigth should be 18) but it works because at most one character is shared between them.
 
 ## [Day 2](https://adventofcode.com/2023/day/2)
-These warmups are more challenging than previous years. The parsing is contrived, particularly because there are multiple layers of vectors involved. Initially i used regex to parse the input, but the API doesn't seem as user-friendly as others and it increased the runtime, so i reverted to simple string parsing to get the runtime bellow 10ms.
+These warmups are more challenging than previous years. The parsing is contrived, particularly because there are multiple layers of vectors involved. Initially i used regular expressions to parse the input, but the API doesn't seem to be as user-friendly as others and it increased the runtime, so i reverted to simple string parsing to get the runtime bellow 10ms.
 
 ## [Day 3](https://adventofcode.com/2023/day/3)
 Clearly a Sunday, as this was a hard puzzle for day 3. 
@@ -38,28 +38,28 @@ I went for a straightforward solution, representing the input as a 2d array and 
 With this setup part two is relatively straightforward just requiring some simple hard coded adaptions.
 
 ## [Day 4](https://adventofcode.com/2023/day/4)
-Relatively easy day. Part one core is the intersection of the 2 sets of numbers on each card. Could/should have been done with sets but i computed it manually. Part two is also straightforward, just propagate the number of winners on each card to the following n cards and sum.
+Relatively easy day. Part one is the intersection of the 2 sets of numbers on each card. Could/should have been done with sets but i computed it manually. Part two is also straightforward, just propagate the number of winners on each card to the following n cards and sum.
 
 ## [Day 5](https://adventofcode.com/2023/day/5)
 First part is relatively easy, apart from parsing the input, which as usual took some time to get right (that's punishment for insisting on C++ for this). It's basically passing each seed through the maps sequentially, and converting it accordingly.
 Part two is much more challenging, and i got to compliment the authors for, given the same input and general structure, with a simple change of the rules devising a completely different problem (and much harder). The general structure is to identify the overlaps on two ranges of numbers and convert each segment individually, keeping the non overlapping in a queue for posterior conversion. Needs attention to the way the looping is done (first through the maps, then through seeds, which is different from what was in part one).
 
 ## [Day 6](https://adventofcode.com/2023/day/6)
-An easy day, with a bit of high school math. The distance traveled is given by the function d(t) = t(T - t), where T is the race time, so we want all solutions for d(t) > D, where D is the given distance. This is a quadratic equation and solving it gives the interval (min_t, max_t) where the traveled distance is greater than D. To get the integer values on that interval calculate ceil(max_t) - floor(min_t) - 1.
+An easy day, with a bit of high school math. The distance traveled is given by d(t) = t(T - t), where T is the race time, so we want all solutions for d(t) > D, where D is the given distance. This is a quadratic equation and solving it gives the interval (min_t, max_t) where the traveled distance is greater than D. To get the integer values on that interval calculate ceil(max_t) - floor(min_t) - 1.
 
 ## [Day 7](https://adventofcode.com/2023/day/7)
 Today wasn't challenging, but it took some work. 
-For part one the relevant issue is to sort the hands according to the rules, so we need to calculate:
-- A score for the type of hands, which is done by replacing each card in the hand with the number of times that card appears in the hand and summing it (so that a five of a kind becomes 25, a four of a kind becomes 17, etc - this creates a correct order on the types);
+For part one the relevant bit is to sort the hands according to the rules, which requires establishing an order on the hands, done by calculating:
+- A score for the type of hands, which is done by replacing each card in the hand with the number of times that card appears in the hand and summing it (so that a five of a kind becomes 25, a four of a kind becomes 16, etc - this creates a correct order on the types);
 - For hands of the same type, substitute `AKQJT` by chars in lexicographic order (`edcba`), so that a string comparison between 2 hands of the same type orders them correctly;
-For part two we need to deal with jokers when determining the hand type. Jokers are substituted by other cards already in the hand, creating new hands without the jokers which are scored, and the maximum type score is used.
+For part two jokers need to be dealt with when determining the hand type. These are substituted by other cards already in the hand, creating new hands without them which are scored, and the maximum type score is used.
 
 ## [Day 8](https://adventofcode.com/2023/day/8)
 Not a hard day, but it had a twist in part two.
 The parsed representation of the input is: 
 1) a string of the path, each character considered individually;
 2) a map where the keys are nodes (as strings) and the values are pairs of the left/right nodes to follow when traversing the graph.
-Given this, part one is a relatively simple tree/graph traversal, starting on the "AAA" node and following the given path until the end node is reached. I included a simple direct loop check, so that the test input from part two didn't hang up here.
+Given this, part one is a relatively simple tree/graph traversal, starting on the "AAA" node and following the given path until the end node is reached. I included a simple direct loop check, so that the test input from part one didn't hang up here.
 For part two there should be multiple start nodes, all those that end with 'A'. My first solution was a direct one, trying to advance from the start nodes step by step following the path, until all of them were end nodes. This (predictably) worked on the test data, but not on the real input data, which become apparent after about 30s of runtime. Taking a second look at the test data, and given previous AoC experiences, it was clear that there should be loops in the paths followed by the different start nodes, and that the solution would be the least common multiple of the length of the different loops. Making a general version of this would take some work (identifying all loops (making sure that they were real loops, considering the path), and account for start path segments not part of the loop), but i first tried a simple solution of taking the initial length of each path until the end node and get the LCM of those lengths - lots of assumptions on this, but thankfully the input was precisely built for this, and i got the right result.
 The end result is very large, so i still had to convert to int64_t to avoid overflows.
 

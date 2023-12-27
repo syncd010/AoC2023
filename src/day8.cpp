@@ -22,14 +22,13 @@ using Graph = unordered_map<string_view, pair<string_view, string_view>>;
 
 // Return input parsed as a pair <path, graph as a map>
 pair<string_view, Graph> parseInput(const string &input) {
-  auto lines = splitStringBy(input, '\n');
+  auto lines = input | splitString('\n');
 
-  string_view path = *lines.begin();
+  string_view path = lines.front();
   Graph graph{};
   for (string_view l : lines | views::drop(1)) {
     graph[l.substr(0, 3)] = make_pair(l.substr(7, 3), l.substr(12, 3));
   }
-
   return make_pair(path, graph);
 }
 
@@ -42,7 +41,7 @@ int traverse(Graph &graph, string_view start, string_view path, auto isEndNode) 
     nextNode = (path[i] == 'L') ? graph[node].first : graph[node].second;
     // Simple sanity check, to avoid obvious loops
     if (nextNode == node) {
-      cout << "Dead end detected, bailing out...\n";
+      // cout << "Dead end detected, bailing out...\n";
       return -1;
     }
   }
@@ -61,20 +60,13 @@ Result solvePartOne(const string &input) {
 
 Result solvePartTwo(const string &input) {
   auto [path, graph] = parseInput(input);
-
-  // Get start nodes
-  auto rg = graph
+  // Get path lengths from nodes ending with 'A' to nodes ending with 'Z'
+  auto pathLen = graph
     | views::filter([](auto p) { return p.first.back() == 'A'; })
-    | views::transform([](auto p) { return p.first; });
-  vector<string_view> nodes(rg.begin(), rg.end());
-
-  vector<int> pathLen{};
-  // Get the path length of each start node until the end node
-  for (auto node : nodes) {
-    pathLen.push_back(traverse(graph, node, path, [](string_view node) { return node.back() == 'Z'; }));
-  }
-  // Result is the lcm of the path lengths
-  return accumulate(pathLen.begin(), pathLen.end(), (int64_t)1, lcm<int64_t, int64_t>);
-
+    | views::transform([&graph, &path](auto p) { 
+        return traverse(graph, p.first, path, [](auto node) { return node.back() == 'Z'; }); 
+      });
+  // Just assume that all paths loop when reaching the end node, and return the LCM
+  return foldLeft(pathLen, (int64_t)1, lcm<int64_t, int64_t>);
 }
 } // namespace aoc8
