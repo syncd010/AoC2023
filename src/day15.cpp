@@ -20,9 +20,9 @@ int64_t dayHash(const string_view s) {
 }
 
 Result solvePartOne(const string &input) {
-  auto steps = splitStringBy(input, ',')
+  auto steps = input
+    | splitString(',')
     | views::transform(dayHash);
-
   return accumulate(steps.begin(), steps.end(), (int64_t)0);
 }
 
@@ -35,21 +35,21 @@ inline tuple<string_view, char, int>destructure(const string_view step) {
 }
 
 Result solvePartTwo(const string &input) {
-  auto steps = splitStringBy(input, ',');
+  auto steps = input
+    | splitString(',');
   vector<vector<pair<string_view, int>>> boxes(256);
 
   for (auto s : steps) {
     auto [label, op, val] = destructure(s);
     auto &box = boxes[dayHash(label)];
-    auto it = find_if(box.begin(), box.end(), [&label](auto p) { return p.first == label; });
+    auto it = ranges::find_if(box, [&label](auto p) { return p.first == label; });
     if (op == '=') {
       if (it != box.end()) {
         it->second = val;
       } else {
         box.push_back(make_pair(label, val));
       }
-    } else {
-      if (it != box.end())
+    } else if (it != box.end()) {
         box.erase(it);
     }
   }

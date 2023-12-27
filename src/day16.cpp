@@ -19,7 +19,7 @@ using namespace aoc;
 using Pos = vec2<int>;
 using Dir = vec2<int>;
 
-// Directions and Invalid marker
+// Directions
 constexpr auto 
   NORTH = Dir(0, -1),
   SOUTH = Dir(0, 1),
@@ -77,15 +77,12 @@ int64_t countEnergized(const vector<string_view> &grid, Pos startPos, Dir startD
 }
 
 Result solvePartOne(const string &input) {
-  auto rg = splitStringBy(input, '\n');
-  auto grid = vector(rg.begin(), rg.end());
-
+  auto grid = toVector(input | splitString('\n'));
   return countEnergized(grid, Pos{0, 0}, EAST);
 }
 
 Result solvePartTwo(const string &input) {
-  auto rg = splitStringBy(input, '\n');
-  auto grid = vector(rg.begin(), rg.end());
+  auto grid = toVector(input | splitString('\n'));
 
   vector<pair<Pos, Dir>> entries{};
   int h = grid.size(), w = grid[0].size();
