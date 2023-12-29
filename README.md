@@ -101,8 +101,13 @@ Part two's description is very convoluted but describes a simple procedure. I us
 
 ## [Day 16](https://adventofcode.com/2023/day/16)
 A similar day to day 10, though a bit easier. Reding part one i was expecting a hard part two, but it turned out to be pretty straightforward.
-The solution is based on following rays through the grid, and when a junction is encountered, generate new rays to follow. Stop when reaching the borders of the grid or when reaching a cell that has already been visited in the same direction. To implement this, a map of junctions/directions is defined, where for each type of junction and direction of travel, the resulting possible directions of travel can be obtained. This allows to quickly generate new rays in the correct direction when a junction is encountered. A grid of cells with a vector of directions is kept to control which cells have been visited and in which direction.
-For part two the runtime is a bit high (about 600ms), so the solution isn't very efficient but it's readable so i kept it.
+The solution is based on sending rays through the grid, and when a junction is encountered, change direction and generate new rays to follow. Stop when reaching the borders of the grid or when reaching a cell that has already been visited in the same direction. To implement this, a map of junctions/directions is used where, for each type of junction and direction of travel, the resulting possible directions of travel can be obtained, generating new rays for those directions. A set of cells / directions is kept to control which cells have been visited and in which direction, stopping when one has already been visited.
+For part two the runtime is a bit high, so the solution isn't very efficient but it's readable so i kept it.
+Post-event: As noticed the solution wasn't very efficient, it took about 800ms with debug info and about 120ms with -O3. To optimize it i had to ditch the vectors, maps and sets and do the following adaptations:
+- Use a plain char array to keep track of visited positions/directions (where each cell has different bits set for different directions traveled);
+- Keep the ray traveling as far as it can until a junction is reached (grid positions are '.' or '-'/'|' while traveling vertically/horizontally);
+- Use a switch to process junctions, instead of using a map with the junctions/new directions.
+This improves the runtime to about 70ms with debug info and 8ms with -O3. Maybe it could still be improved by using threads but it's enough for now.
 
 ## [Day 17](https://adventofcode.com/2023/day/17)
 Not yest finished as it is too inefficient.

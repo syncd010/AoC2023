@@ -7,6 +7,7 @@
 #include <string_view>
 #include <vector>
 #include <unordered_map>
+#include <format>
 
 #include "aoc.h"
 #include "utils.h"
@@ -27,52 +28,55 @@ constexpr auto
   WEST = Dir(-1, 0);
 
 int64_t countEnergized(const vector<string_view> &grid, Pos startPos, Dir startDir) {
-  // Direction changes map
-  const unordered_map<char, unordered_map<Dir, vector<Dir>, vec2Hash<int>>> dirChanges = {
-    {'|', { { NORTH, { NORTH } }, { SOUTH, { SOUTH } }, { EAST, { NORTH, SOUTH } }, { WEST, { NORTH, SOUTH } } } },
-    {'-', { { NORTH, { EAST, WEST } }, { SOUTH, { EAST, WEST } }, { EAST, { EAST } }, { WEST, { WEST } } } },
-    {'\\', { { NORTH, { WEST } }, { SOUTH, { EAST } }, { EAST, { SOUTH } }, { WEST, { NORTH } } } },
-    {'/', { { NORTH, { EAST } }, { SOUTH, { WEST } }, { EAST, { NORTH } }, { WEST, { SOUTH } } } },
-    {'.', { { NORTH, { NORTH } }, { SOUTH, { SOUTH } }, { EAST, { EAST } }, { WEST, { WEST } } } },
-  };
-
-  // This keeps for each cell the directions it has been traveled
-  auto visited = vector(grid.size(), vector(grid[0].size(), vector<Dir>{}));
-
+  int h = grid.size(), w = grid[0].size();
+  char visitedGrid[h][w]{};
   // Keep a list of rays currently traveling
   vector<pair<Pos, Dir>> rays{ make_pair(startPos, startDir) };
+  int energized = 0;
   while (!rays.empty()) {
     auto [pos, dir] = rays.back();
     rays.pop_back();
+    // Bit vector with different bits set for different directions
+    char dirBits = 1 << ((dir.x + 1) * 2 + (dir.y + 1));
 
-    // Check if cell already visited in the same direction
-    if (auto cell = visited[pos.y][pos.x];
-        find(cell.begin(), cell.end(), dir) != cell.end()) 
-        continue;
+    // Outside board or already visited in the same direction
+    if (!inBounds(pos.x, 0, w) || !inBounds(pos.y, 0, h) || (visitedGrid[pos.y][pos.x] & dirBits)) 
+      continue;
 
-    // Handle empty spaces, following the same dir
-    while (insideBoard(grid, pos) && (grid[pos.y][pos.x] == '.')) {
-      visited[pos.y][pos.x].push_back(dir);
-      pos += dir;
-    }
-    if (!insideBoard(grid, pos)) continue;
-    // We are at a junction, get new dirs and generate new rays
-    visited[pos.y][pos.x].push_back(dir);
-    vector<Dir> newDirs = dirChanges.at(grid[pos.y][pos.x]).at(dir);
-    for (auto d : newDirs) {
-      if (Pos newPos = pos + d; insideBoard(grid, newPos)) {
-        rays.push_back(make_pair(newPos, d));
+    // Follow empty spaces, in the same dir
+    while (inBounds(pos.x, 0, w) && inBounds(pos.y, 0, h)) {
+      auto c = grid[pos.y][pos.x];
+      // Count energized if not visited and mark visited
+      if (!visitedGrid[pos.y][pos.x]) energized++;
+      visitedGrid[pos.y][pos.x] |= dirBits;
+
+      // Keep going if possible
+      if (c == '.' || (c == '-' && dir.y == 0) || (c == '|' && dir.x == 0)) {
+        pos += dir;
+      } else {
+        break;
       }
     }
-  }
 
-  int64_t energized = 0;
-  for (int y = 0; y < visited.size(); y++) {
-    for (int x = 0; x < visited[y].size(); x++) {
-      energized += (visited[y][x].size() > 0);
+    if (!inBounds(pos.x, 0, w) || !inBounds(pos.y, 0, h)) continue;
+    auto c = grid[pos.y][pos.x];
+    // We're at a junction, change direction of ray
+    if (c == '\\') {
+      auto newDir = Dir(dir.y, dir.x);
+      rays.push_back(make_pair(pos + newDir, newDir));
+    } else if (c == '/') {
+      auto newDir = Dir(-dir.y, -dir.x);
+      rays.push_back(make_pair(pos + newDir, newDir));
+    } else if (c == '|') {
+      auto newDir1 = Dir(0, 1), newDir2 = Dir(0, -1);
+      rays.push_back(make_pair(pos + newDir1, newDir1));
+      rays.push_back(make_pair(pos + newDir2, newDir2));
+    } else if (c == '-') {
+      auto newDir1 = Dir(1, 0), newDir2 = Dir(-1, 0);
+      rays.push_back(make_pair(pos + newDir1, newDir1));
+      rays.push_back(make_pair(pos + newDir2, newDir2));
     }
   }
-
   return energized;
 }
 
@@ -81,9 +85,11 @@ Result solvePartOne(const string &input) {
   return countEnergized(grid, Pos{0, 0}, EAST);
 }
 
+
 Result solvePartTwo(const string &input) {
   auto grid = toVector(input | splitString('\n'));
 
+  // Entry points along border
   vector<pair<Pos, Dir>> entries{};
   int h = grid.size(), w = grid[0].size();
   for (int y = 0; y < h; y++) {
@@ -95,7 +101,8 @@ Result solvePartTwo(const string &input) {
     entries.push_back(make_pair(Pos{x, h - 1}, NORTH));
   }
 
-  return accumulate(entries.begin(), entries.end(), (int64_t)0, 
-    [&grid](auto m, auto entry) { return max(m, countEnergized(grid, entry.first, entry.second)); });
+  return foldLeft(entries, (int64_t)0, [&grid](auto m, auto entry) { 
+      return max(m, countEnergized(grid, entry.first, entry.second)); 
+    });
 }
 } // namespace aoc16

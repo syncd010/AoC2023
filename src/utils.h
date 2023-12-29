@@ -163,11 +163,11 @@ inline void hash_combine(std::size_t& seed, const T& v) {
 template<typename T>
 struct vec2Hash {
     std::size_t operator()(const vec2<T>& v) const noexcept {
-      // size_t seed = 0;
-      // hash_combine(seed, v.x);
-      // hash_combine(seed, v.y);
-      // return seed;
-      return (v.x + v.y) * (v.x + v.y + 1) / 2 + v.y;
+      size_t seed = 0;
+      hash_combine(seed, v.x);
+      hash_combine(seed, v.y);
+      return seed;
+      // return (v.x + v.y) * (v.x + v.y + 1) / 2 + v.y;
     }
 };
 
