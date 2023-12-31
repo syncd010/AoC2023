@@ -22,12 +22,11 @@ using Dir = vec2<int64_t>;
 using Pos = vec2<int64_t>;
 
 vector<Instruction> parseInput(const string &input) {
-  auto rg = input
+  return toVector(input
     | splitString('\n')
     | views::transform([](string_view line) {
       return make_tuple(line.at(0), ston<int>(line.substr(2, line.find(' ', 2) - 2)), line.substr(line.find('(', 2) + 1, 7));
-    });
-  return vector(rg.begin(), rg.end());
+    }));
 }
 
 vector<Pos> getVertices(const vector<Instruction> &inst) {

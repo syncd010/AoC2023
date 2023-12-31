@@ -51,50 +51,12 @@ constexpr T ston(std::string_view str, const int base = 10) {
 }
 
 /**
- * Splits a string with numbers into a vector of ints
+ * Ranges::view that splits a string with numbers into a vector of ints
  * 
- * @param str String to split, assumes it has numbers
  * @param delim delimiter to use to separate the numbers
  * @param base Base to interpret numbers
- * @return Vector of ints
+ * @return ints
 */
-template <typename T, typename U>
-std::vector<T> splitStringToNumbers(const std::string_view str, const U delim, int base = 10) {
-  auto splits = str
-    | std::views::split(delim)
-    | std::views::filter([](auto rg) { return !rg.empty(); })
-    | std::views::transform([](auto rg) {
-      return ston<T>(std::string_view(rg.begin(), rg.end()));
-    });
-    return std::vector(splits.begin(), splits.end());
-}
-
-/**
- * Splits a string by a delimiter
- * 
- * @param str String to split
- * @param delim delimiter to use
- * @return Range with string splits, each one converted to string
-*/
-template<typename R = std::string_view, typename T = char>
-constexpr auto splitStringBy(const std::string_view &str, const T &delim, bool keepEmptyLines = false) {
-  return str
-    | std::views::split(delim)
-    | std::views::filter([keepEmptyLines](auto rg) { return keepEmptyLines || !rg.empty(); })
-    | std::views::transform([](auto rg){
-          return R(rg.begin(), rg.end());
-      });
-};
-
-template<typename R=std::string_view, typename T = char>
-constexpr auto splitString(const T &delim, bool keepEmptyLines = false) {
-  return std::views::split(delim)
-    | std::views::filter([keepEmptyLines](auto rg) { return keepEmptyLines || !rg.empty(); })
-    | std::views::transform([](auto rg){
-          return R(rg.begin(), rg.end());
-      });
-};
-
 template <typename T = int, typename U = char>
 constexpr auto splitNumbers(const U delim, int base = 10) {
   return std::views::split(delim)
@@ -103,6 +65,22 @@ constexpr auto splitNumbers(const U delim, int base = 10) {
       return ston<T>(std::string_view(rg.begin(), rg.end()));
     });
 }
+
+/**
+ * Ranges::view that splits a range by a delimiter, tipically a string
+ * 
+ * @param delim delimiter to use
+ * @param keepEmpty whether to keep empty ranges
+ * @return Range with string splits, each one converted to string
+*/
+template<typename R=std::string_view, typename T = char>
+constexpr auto splitString(const T &delim, bool keepEmpty = false) {
+  return std::views::split(delim)
+    | std::views::filter([keepEmpty](auto rg) { return keepEmpty || !rg.empty(); })
+    | std::views::transform([](auto rg){
+          return R(rg.begin(), rg.end());
+      });
+};
 
 /**
  * Simple 2D position / direction encapsulation
