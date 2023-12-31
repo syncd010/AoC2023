@@ -7,9 +7,10 @@
 #include <string_view>
 #include <vector>
 #include <functional>
+#include <deque>
 #include <queue>
 #include <unordered_set>
-#include <set>
+#include <format>
 
 #include "aoc.h"
 #include "utils.h"
@@ -24,60 +25,23 @@ using Pos = vec2<int>;
 using Dir = vec2<int>;
 
 Grid parseInput(const string &input) {
-  auto rg = splitStringBy(input, '\n')
+  return toVector(input
+    | splitString('\n')
     | views::transform([](auto line) {
-      auto rg = line | views::transform([](auto c) { return c - '0'; });
-      return vector(rg.begin(), rg.end());
-      });
-  return vector(rg.begin(), rg.end());
-}
-
-/**
- * Simple greedy search
- * 
- * @param start Start node
- * @param successorsFn Function that returns successors to a node. Should be (const T &) -> vector(T)
- * @param isGoalFn Function that returns whether a node is the goal. Should be (const T &) -> bool
- * @param comparisonFn Function to order nodes in the priority queue. Should be (const T &) -> bool
-*/
-template<typename T>
-T greedySearch(const T &start, 
-               auto successorsFn, 
-               auto isGoalFn, 
-               auto comparisonFn) {
-  int64_t count = 0;
-  priority_queue<T, vector<T>, decltype(comparisonFn)> frontier{comparisonFn};
-  frontier.push(start);
-  unordered_set<T> explored{start};
-  while (!frontier.empty()) {
-    count ++;
-    auto current = frontier.top();
-    frontier.pop();
-    if (isGoalFn(current)) {
-      // cout << "Explored: " << count << "\n";
-      return current;
-    }
-    for (auto next : successorsFn(current)) {
-      if (explored.contains(next)) continue;
-      explored.insert(next);
-      frontier.push(next);
-    }
-  }
-  return T{};
+      return toVector(line | views::transform([](auto c) { return c - '0'; }));
+      })
+  );
 }
 
 struct State {
-  Pos position;
-  Dir direction;
-  int straightStepsTaken;
+  Pos pos;
+  Dir dir;
   int cost;
+  // int prev = -1;
 
-  // bool operator==(const State &other) const = default;
-  // auto operator<=>(const State &other) const = default;
   bool operator==(const State &other) const {
-    return (position == other.position) &&
-      (direction == other.direction) &&
-      (straightStepsTaken == other.straightStepsTaken);
+    return (pos == other.pos) &&
+      (dir == other.dir);
   };
   auto operator<(const State &other) const {
     return cost < other.cost;
@@ -85,73 +49,63 @@ struct State {
 };
 
 std::ostream & operator<<(std::ostream &os, const State &s) {
-	os << "Pos: " << s.position << ", Dir: " << s.direction << ", Steps taken: " << s.straightStepsTaken << ", Cost: " << s.cost;
+	os << "Pos: " << s.pos << ", Dir: " << s.dir << ", Cost: " << s.cost;
 	return os;
 }
 
-// Directions and Invalid marker
-constexpr auto 
-  EAST = Dir(1, 0),
-  WEST = Dir(-1, 0),
-  SOUTH = Dir(0, 1),
-  NORTH = Dir(0, -1);
+// Rotates clockwise/counterclockwise
+inline Dir rotate(const Dir &pos, int dir = 1) { 
+  return Dir(pos.y * dir, pos.x * (-dir));
+}
+
+auto successors(const State &state, const auto &grid, int minSteps, int maxSteps) {
+  vector<State> successors{};
+  // Generate all possible successors: turns between minSteps and maxSteps
+  int cost = state.cost;
+  auto pos = state.pos + state.dir;
+  for (int i = 1; i <= maxSteps && insideBoard(grid, pos); i++, pos += state.dir) {
+    cost += grid[pos.y][pos.x];
+    if (i < minSteps) continue;
+    // Add turns
+    auto turnLeft = rotate(state.dir, 1), turnRight = rotate(state.dir, -1);
+    successors.push_back(State(pos, turnLeft, cost));
+    successors.push_back(State(pos, turnRight, cost));
+  }
+  return successors;
+};
+
+inline int dirIdx(Dir d) { return abs(d.x) * 2 + (d.x + 1) / 2 + (d.y + 1) / 2; };
 
 Result solve(const string &input, int minSteps = 1, int maxSteps = 3) {
   auto grid = parseInput(input);
   auto h = grid.size(), w = grid[0].size();
 
-  const auto moves = vector{EAST, WEST, SOUTH, NORTH};
-
-  auto successorsFn = [&grid, &moves, minSteps, maxSteps](const State &state) {
-    vector<State> successors{};
-
-    if (state.straightStepsTaken < minSteps) {
-      if (!insideBoard(grid, state.position + state.direction * (minSteps - 1))) return successors;
-      auto p = state.position;
-      int newCost = state.cost;
-      for (int i = 0; i < (minSteps - 1); i++) {
-        p += state.direction;
-        newCost += grid[p.y][p.x];
-      }
-      successors.push_back(State(p, state.direction, state.straightStepsTaken + 3, newCost));
-      return successors;
+  Pos finalPos{(int)w - 1, (int)h - 1};
+  State startEast{Pos{0, 0}, Dir{1, 0}, 0}, startSouth{Pos{0, 0}, Dir{0, 1}, 0};
+  auto comparisonFn = [](const State &s1, const State &s2) noexcept {
+    return s1.cost > s2.cost;     // Minimum cost
+  };
+  priority_queue<State, vector<State>, decltype(comparisonFn)> frontier { comparisonFn, vector{startSouth, startEast}};
+  auto reached = vector(h, vector(w, vector<int>(4, { INT32_MAX })));
+  // Djikstra search
+  while (!frontier.empty()) {
+    auto current = frontier.top();
+    frontier.pop();
+      // Check if we can reach the current node with strictly smaller cost
+    if (current.cost > reached[current.pos.y][current.pos.x][dirIdx(current.dir)]) continue;
+    if (current.pos == finalPos) {
+      return current.cost;
     }
-
-    for (auto d : moves) {
-      // Can't turn back
-      if (d == Dir(0, 0) - state.direction) continue;
-
-      auto p = state.position + d;
-      if (!insideBoard(grid, p)) continue;
-      auto straightStepsTaken = 0;
-      if (d == state.direction) {
-        // Same direction, keep count of straight steps taken
-        if (state.straightStepsTaken == maxSteps) continue;
-        straightStepsTaken = state.straightStepsTaken;
-      }
-      auto newState = State(p, d, ++straightStepsTaken, state.cost + grid[p.y][p.x]);
-      // cout << "Adding: " << newState << "\n";
-      successors.push_back(newState);
+    for (auto next : successors(current, grid, minSteps, maxSteps)) {
+      // Check if we can already reach the next node with smaller cost
+      auto &prevCost = reached[next.pos.y][next.pos.x][dirIdx(next.dir)];
+      if (next.cost >= prevCost) continue;
+      prevCost = next.cost;
+      frontier.push(next);
     }
-    return successors;
-  };
-
-  auto isGoalFn = [h, w, minSteps](const State &state) {
-    return state.position.y == h - 1 && state.position.x == w - 1 && state.straightStepsTaken >= minSteps;
-  };
-
-  auto comparisonFn = [](const State &s1, const State &s2) {
-    // Get the minimum cost
-    return s1.cost > s2.cost;
-  };
-
-  State startEast{Pos{0, 0}, Dir{1, 0}, 1, 0};
-  State costEast = greedySearch(startEast, successorsFn, isGoalFn, comparisonFn);
-  State startSouth{Pos{0, 0}, Dir{0, 1}, 1, 0};
-  State costSouth = greedySearch(startSouth, successorsFn, isGoalFn, comparisonFn);
-  return min(costEast.cost, costSouth.cost);
+  }
+  return monostate();
 }
-
 
 Result solvePartOne(const string &input) {
   return solve(input, 1, 3);
@@ -161,17 +115,3 @@ Result solvePartTwo(const string &input) {
   return solve(input, 4, 10);
 }
 } // namespace aoc17
-
-template<>
-struct std::hash<aoc17::State>
-{
-    std::size_t operator()(const aoc17::State &state) const noexcept {
-      std::size_t seed = 0;
-      aoc::hash_combine(seed, state.position.x);
-      aoc::hash_combine(seed, state.position.y);
-      aoc::hash_combine(seed, state.direction.x);
-      aoc::hash_combine(seed, state.direction.y);
-      aoc::hash_combine(seed, state.straightStepsTaken);
-      return seed;
-    }
-};

@@ -110,7 +110,11 @@ Post-event: As noticed the solution wasn't very efficient, it took about 800ms w
 This improves the runtime to about 70ms with debug info and 8ms with -O3. Maybe it could still be improved by using threads but it's enough for now.
 
 ## [Day 17](https://adventofcode.com/2023/day/17)
-Not yest finished as it is too inefficient.
+This was a familiar day, a Uniform Cost Search problem, where the conditions have to respect the description. This was so familiar that i solved it initially by using code from last year: a generic greedy search in Dart. It was pretty quick  and straightforward to implement, but this year is C++, so i coded that generic search in C++. I'm not really happy with the result given that the runtime is about 1800ms with debug info, 470ms with -O3, but that's what i have time for for now.
+Post-event: I returned to this problem because i wasn't happy with the runtime. As usual the key to improve this kind of problems is to reduce the number of nodes that are generated, so i changed the implementation with the following:
+- Instead of generating next states one by one (step by step), generate all possible states from a position/direction. These are the positions that are between min and max steps away from the current one, and are rotated 90 and 180 degrees. No need to generate the intermediate "going forward" positions;
+- Only save states in the frontier if they have the least cost to reach a given position/direction. This is can be seen as a bit redundant with the use of a priority queue in the search, but it allows to cut a lot of states to analyze. Also, when processing a state, always check if it can be reached with a lower cost.
+With these runtimes were improved to about 35ms (both parts). Further improvements could be done, like replacing the priority queue with a bucket queue or similar, but that i like the simplicity and readability of priority queues so i let it stay as is.
 
 ## [Day 18](https://adventofcode.com/2023/day/18)
 It's a learn something new day. Part one was initially done similarly to day 10, though that didn't scale to part two. Spent part of the day trying to devise a way to get the interior area from a list of the vertices, but before implementing something complex i gave up and looked for clues on Reddit to check if that was the right track. Learned about [Shoelace formula](https://en.wikipedia.org/wiki/Shoelace_formula) and [Pick's theorem](https://en.wikipedia.org/wiki/Pick%27s_theorem) and also that, next time, need to look for clues earlier.
