@@ -25,12 +25,12 @@ vector<Brick> parseInput(const string &input) {
         | splitString('~')
         | views::transform([](string_view end) {
           auto v = toVector(end | splitNumbers(','));
-          return vec3(v[0], v[1], v[2]);
+          return vec3<int>(v[0], v[1], v[2]);
         });
       auto v1 = *(rg.begin());
       auto v2 = *(++rg.begin());
-      v1 = vec3(min(v1.x, v2.x), min(v1.y, v2.y), min(v1.z, v2.z));
-      v2 = vec3(max(v1.x, v2.x), max(v1.y, v2.y), max(v1.z, v2.z));
+      v1 = vec3<int>(min(v1.x, v2.x), min(v1.y, v2.y), min(v1.z, v2.z));
+      v2 = vec3<int>(max(v1.x, v2.x), max(v1.y, v2.y), max(v1.z, v2.z));
       return make_pair(v1, v2);
      }));
 }

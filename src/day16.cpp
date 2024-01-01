@@ -29,7 +29,8 @@ constexpr auto
 
 int64_t countEnergized(const vector<string_view> &grid, Pos startPos, Dir startDir) {
   int h = grid.size(), w = grid[0].size();
-  char visitedGrid[h][w]{};
+  // char visitedGrid[h][w]{};
+  auto visitedGrid = vector(h, vector<char>(w, 0));
   // Keep a list of rays currently traveling
   vector<pair<Pos, Dir>> rays{ make_pair(startPos, startDir) };
   int energized = 0;

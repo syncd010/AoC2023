@@ -74,7 +74,7 @@ Result solvePartOne(const string &input) {
 }
 
 // Lagrange interpolation polynomial
-auto lagrangePoly(vector<int64_t> xs, vector<int64_t>ys) {
+auto lagrangePoly(const vector<int64_t> &xs, const vector<int64_t> &ys) {
   return [&xs, &ys](int64_t x) {
     int n = xs.size();
     int64_t sum = 0;
