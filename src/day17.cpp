@@ -85,23 +85,27 @@ Result solve(const string &input, int minSteps = 1, int maxSteps = 3) {
   auto comparisonFn = [](const State &s1, const State &s2) noexcept {
     return s1.cost > s2.cost;     // Minimum cost
   };
-  priority_queue<State, vector<State>, decltype(comparisonFn)> frontier { comparisonFn, vector{startSouth, startEast}};
+  // priority_queue<State, vector<State>, decltype(comparisonFn)> frontier { comparisonFn, vector{startSouth, startEast}};
+  auto frontier = vector<vector<State>>(2000, {startSouth, startEast});
   auto reached = vector(h, vector(w, vector<int>(4, { INT32_MAX })));
   // Djikstra search
-  while (!frontier.empty()) {
-    auto current = frontier.top();
-    frontier.pop();
-      // Check if we can reach the current node with strictly smaller cost
-    if (current.cost > reached[current.pos.y][current.pos.x][dirIdx(current.dir)]) continue;
-    if (current.pos == finalPos) {
-      return current.cost;
-    }
-    for (auto next : successors(current, grid, minSteps, maxSteps)) {
-      // Check if we can already reach the next node with smaller cost
-      auto &prevCost = reached[next.pos.y][next.pos.x][dirIdx(next.dir)];
-      if (next.cost >= prevCost) continue;
-      prevCost = next.cost;
-      frontier.push(next);
+  for (auto costIdx = 0; costIdx < frontier.size(); costIdx++) {
+    for (auto current : frontier[costIdx])  {
+        // Check if we can reach the current node with strictly smaller cost
+      if (current.cost > reached[current.pos.y][current.pos.x][dirIdx(current.dir)]) continue;
+      if (current.pos == finalPos) {
+        return current.cost;
+      }
+      for (auto next : successors(current, grid, minSteps, maxSteps)) {
+        // Check if we can already reach the next node with smaller cost
+        auto &prevCost = reached[next.pos.y][next.pos.x][dirIdx(next.dir)];
+        if (next.cost >= prevCost) continue;
+        prevCost = next.cost;
+        if (next.cost > frontier.size()) {
+          frontier.resize(next.cost * 1.5);
+        }
+        frontier[next.cost].push_back(next);
+      }
     }
   }
   return monostate();
