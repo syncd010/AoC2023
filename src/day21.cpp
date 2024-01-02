@@ -30,14 +30,18 @@ constexpr auto
 
 constexpr char START = 'S', ROCK = '#', EMPTY = '.';
 
-// Returns the visited nodes on the grid, with max steps limit
-auto bfs(const vector<string_view> &grid, int maxSteps, bool infiniteBoard) {
+// Returns the active nodes on the grid, with max steps limit
+auto countActive(const vector<string_view> &grid, int maxSteps, bool infiniteBoard) {
   int h = grid.size(), w = grid[0].size();  
   Pos startPos{h / 2, w / 2};
   const auto dirs = vector{EAST, WEST, SOUTH, NORTH};
-  unordered_map<Pos, int, vec2Hash<int>> visited{ { startPos, 0 } };
   deque<pair<Pos, int>> frontier{ {startPos, 0 }};
+  int vh = 2 * (maxSteps + 1), vw = 2 * (maxSteps + 1);
+  int cy = (vh - h) / 2, cx = (vw - w) / 2;
+  auto visited = vector(vh, vector(vw, -1));
+  visited[cy + startPos.y][cx + startPos.x] = 0;
 
+  int64_t active = (maxSteps % 2 == 0);
   while (!frontier.empty()) {
     auto [p, step] = frontier.front();
     frontier.pop_front();
@@ -46,31 +50,23 @@ auto bfs(const vector<string_view> &grid, int maxSteps, bool infiniteBoard) {
     for (const auto &d : dirs) {
       auto nextP = p + d;
       auto x = nextP.x % w, y = nextP.y % h;
-      if (x < 0) x = w + x;
-      if (y < 0) y = h + y;
+      if (x < 0) x += w;
+      if (y < 0) y += h;
       if ((infiniteBoard || insideBoard(grid, nextP)) && 
           (grid[y][x] != ROCK) && 
-          (!visited.contains(nextP))) {
-        visited[nextP] = step;
+          (visited[cy + nextP.y][cx + nextP.x] == -1)) {
+        visited[cy + nextP.y][cx + nextP.x] = step;
+        active += ((step % 2) == (maxSteps % 2));
         frontier.push_back(make_pair(nextP, step));
       }
     }
   }
-
-  return visited;
-}
-
-// Counts the number of active positions
-int64_t countActive(const auto &visited, int64_t maxSteps) {
-  return foldLeft(visited, (int64_t)0, 
-    [maxSteps](auto prev, auto pair) { 
-        return (pair.second % 2 == maxSteps %2) ? prev + 1 : prev; 
-      });
+  return active;
 }
 
 Result solvePartOne(const string &input) {
   auto grid = toVector(input | splitString<string_view>('\n'));
-  return countActive(bfs(grid, 64, false), 64);
+  return countActive(grid, 64, false);
 }
 
 // Lagrange interpolation polynomial
@@ -94,7 +90,7 @@ Result solvePartTwo(const string &input) {
   auto grid = toVector(input | splitString<string_view>('\n'));
   int h = grid.size(), halfH = h / 2;
   vector<int64_t> xs{h/2, h/2 + h, h/2 + 2*h};
-  vector<int64_t> ys = toVector(xs | views::transform([&grid](auto x) { return countActive(bfs(grid, x, true), x); }));
+  vector<int64_t> ys = toVector(xs | views::transform([&grid](auto x) { return countActive(grid, x, true); }));
   
   return lagrangePoly(xs, ys)(26501365);
 
