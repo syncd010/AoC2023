@@ -9,6 +9,7 @@
 #include <unordered_map>
 #include <tuple>
 #include <queue>
+#include <functional>
 
 #include "aoc.h"
 #include "utils.h"
@@ -23,14 +24,16 @@ struct Gate {
   string_view id;
   char type;
   bool state;
-  vector<string_view> inputs, outputs;
+  vector<string_view> inputIds, outputIds;
+  // For performance reasons, store references to input/output gates
+  vector<reference_wrapper<Gate>> inputGates, outputGates;
 };
 
 using Circuit = unordered_map<string_view, Gate>;
 
 // Represents a pulse
 struct Pulse {
-  string_view sourceId, destId;
+  Gate &sourceGate, &destGate;
   bool value;
 };
 
@@ -48,33 +51,34 @@ Circuit parseInput(const string &input) {
   }
 
   // Fill gate inputs
-  for (auto [sourceId, gate] : gates) {
-    for (auto destId : gate.outputs) {
+  for (const auto &[sourceId, gate] : gates) {
+    for (auto destId : gate.outputIds) {
       if (!gates.contains(destId)) {
         gates[destId] = Gate(destId, ' ', false, {}, {});
       }
-      gates[destId].inputs.push_back(sourceId);
+      gates[destId].inputIds.push_back(sourceId);
+
+      gates[sourceId].outputGates.push_back(gates[destId]);
+      gates[destId].inputGates.push_back(gates[sourceId]);
     }
   }
-
   return gates;
 }
 
 // Processes a pulse, updating the circuit. Returns whether there was a switch
-bool processPulse(const Pulse &pulse, Circuit &gates) {
-  Gate &sourceGate = gates[pulse.sourceId], &destGate = gates[pulse.destId];
-  bool initialState = destGate.state, 
-    switched = true;
+bool processPulse(const Pulse &pulse) {
+  Gate &sourceGate = pulse.sourceGate, &destGate = pulse.destGate;
+  bool switched = true;
 
   if (destGate.type == '%') {
     // Flip Flop, switch on down
     switched = (sourceGate.state == false);
-    destGate.state = (switched)? !initialState : initialState;
+    if (switched) destGate.state = !destGate.state;
   } else if (destGate.type == '&') {
     // NAND
-    initialState = true;
-    for (auto id : destGate.inputs) {
-      initialState = initialState & gates[id].state;
+    auto initialState = true;
+    for (auto g : destGate.inputGates) {
+      initialState = initialState & g.get().state;
     }
     destGate.state = !initialState;
   } else {
@@ -87,18 +91,17 @@ bool processPulse(const Pulse &pulse, Circuit &gates) {
 // Runs a cycle of a button push
 // Updates the circuit with the state and returns the pulses generated
 vector<Pulse> pushTheButton(Circuit &gates) {
-  queue<string_view> frontier({"broadcaster"sv});
+  queue<reference_wrapper<Gate>> frontier({ gates.at("broadcaster"sv) });
   vector<Pulse> pulses{};
   while (!frontier.empty()) {
-    auto sourceId = frontier.front();
+    auto &sourceGate = frontier.front().get();
     frontier.pop();
-    if (!gates.contains(sourceId)) continue;
 
-    for (auto destId : gates.at(sourceId).outputs) {
-      Pulse pulse{sourceId, destId, gates[sourceId].state};
+    for (auto destGate : sourceGate.outputGates) {
+      Pulse pulse{sourceGate, destGate, sourceGate.state};
       pulses.push_back(pulse);
-      bool switched = processPulse(pulse, gates);
-      if (switched) frontier.push(destId);
+      bool switched = processPulse(pulse);
+      if (switched) frontier.push(destGate);
     }
   }
   return pulses;
@@ -126,13 +129,12 @@ Result solvePartTwo(const string &input) {
   // Test data doesn't contain RX
   if (!gates.contains("rx")) return 0;
 
-  // By inspection of the input:
-  // RX is the result of a single NAND gate "LL"
-  // LL gets its input from 4 gates, which i assume form 4 distinct chains from 
-  // the start. LL will be on (and RX off) only when all 4 inputs are on, so,
-  // calculate the length of the 4 loops (which is prime) and return its mcm
+  // By inspection of the input: RX is the result of a single NAND gate "LL"
+  // LL gets its input from 4 gates, which form 4 distinct chains from the start. 
+  // LL will be on (and RX off) only when all 4 inputs are on, so calculate the 
+  // length of the 4 loops (which is prime) and return its lcm
   unordered_map<string_view, int> rxChains{};
-  for (auto s : gates[gates["rx"].inputs.front()].inputs) {
+  for (auto s : gates[gates["rx"].inputIds.front()].inputIds) {
     rxChains[s] = 0;
   }
 
@@ -143,8 +145,8 @@ Result solvePartTwo(const string &input) {
     step++;
     // Check if we got an on state on any of the relevant gates and store the step
     for (auto s : pulses) {
-      if (rxChains.contains(s.sourceId) && s.value && rxChains[s.sourceId] == 0) {
-        rxChains[s.sourceId] = step;
+      if (s.value && rxChains.contains(s.sourceGate.id) && rxChains[s.sourceGate.id] == 0) {
+        rxChains[s.sourceGate.id] = step;
       }
     }
     finished = all_of(rxChains.begin(), rxChains.end(), [](auto v) { return v.second != 0; });
