@@ -142,7 +142,8 @@ This was the first day that i felt i couldn't solve on my own. I've looked for c
 Post-event: Optimizing this to run in less than 10ms needed the usual trick of substituting the visited set (map) by a vector and mark the visited nodes there. This improves runtime from 40ms to about 8ms, at the cost of making the code more complex and less legible.
 
 ## [Day 22](https://adventofcode.com/2023/day/22)
-Simplified 3D tetris is a nice one. Not much to say, for now it just tries to drop down each piece one place at a time and checks for collisions. A bit inefficient, takes a couple of seconds to run, so i need to revisit this, but not today.
+Simplified 3D tetris is a nice one. Not much to say, for now it just tries to drop down each piece one place at a time and checks for collisions. A bit inefficient, takes about 160ms to run, so i need to revisit this, but not today.
+Post-event: It was indeed inefficient. The algorithm was O(n^3), which is kind of lame, and only worked because the input was small. A new approach was needed, so the strategy now is to keep 2 lists of the bricks that support/are supported by others and use that to get the results. Part one marks bricks that singly support another one and counts them. Part two works from the bottom up: for each brick keep a queue of fallen bricks initialized with the current one. For each fallen brick mark the bricks supported by it (above) as fallen if all of their supports (bellow) are marked as fallen, updating the queue and iterating until the queue is empty. This is still a O(n^2/2) algorithm but runtime decreased to about 4ms.
 
 ## [Day 23](https://adventofcode.com/2023/day/23)
 Nice day, though the solution is too much inefficient (about 30s). Need to optimize it further, but not now.
