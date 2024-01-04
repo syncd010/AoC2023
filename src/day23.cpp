@@ -29,47 +29,33 @@ constexpr auto NORTH = Dir(0, -1), SOUTH = Dir(0, 1), EAST = Dir(1, 0), WEST = D
 
 // Transforms the grid to a graph representation
 auto gridToGraph(const vector<string> &grid) {
-  int h = grid.size(), w = grid[0].size();
   const auto dirs = vector{EAST, WEST, SOUTH, NORTH};
   const auto forbidden = unordered_map<char, Pos>{ { '>', WEST }, { '<', EAST }, { 'v', NORTH }, { '^', SOUTH } };
+  auto validPos = [&forbidden](const vector<string> &grid, Pos pos, Dir dir) {
+    return insideBoard(grid, pos) &&
+      ((grid[pos.y][pos.x] == EMPTY) ||
+      (forbidden.contains(grid[pos.y][pos.x]) && (dir != forbidden.at(grid[pos.y][pos.x]))));
+  };
 
-  auto successors = [&grid, &dirs, &forbidden](const Pos &origin) {
+  auto successors = [&grid, &dirs, &validPos](const Pos &origin) {
     vector<pair<Pos, int>> succ{};
 
     for (auto pathDir : dirs) {
       auto pos = origin + pathDir;
-      if (!insideBoard(grid, pos) ||
-          (grid[pos.y][pos.x] == WALL) ||
-          ((grid[pos.y][pos.x] != EMPTY) && (pathDir == forbidden.at(grid[pos.y][pos.x]))))
-         continue;
-      // if (!insideBoard(grid, pos) ||
-      //     (grid[pos.y][pos.x] == WALL))
-      //    continue;
-      auto steps = 1;
-      bool junctionFound = false;
-      while (!junctionFound) {
+      if (!validPos(grid, pos, pathDir)) continue;
+      for (int steps = 1;;steps++) {
         auto possibleDirs = toVector(dirs 
-          | views::filter([&grid, &forbidden, &pos, &pathDir](Dir d) {
-              auto proposedPos = pos + d;
-              // return 
-              //   (insideBoard(grid, proposedPos) && 
-              //    (proposedPos != pos - pathDir) &&
-              //    (grid[proposedPos.y][proposedPos.x] != WALL));
-              return 
-                (insideBoard(grid, proposedPos) && 
-                (proposedPos != pos - pathDir) &&
-                ((grid[proposedPos.y][proposedPos.x] == EMPTY) ||
-                 ((grid[proposedPos.y][proposedPos.x] != WALL) &&
-                  (d != forbidden.at(grid[proposedPos.y][proposedPos.x])))));
+          | views::filter([&grid, &validPos, &pos, &pathDir](Dir d) {
+              return (d != -pathDir) && validPos(grid, pos + d, d);
             }));
-        junctionFound = !(possibleDirs.size() == 1);
-        if (!junctionFound) {
-          pathDir = possibleDirs.front();
-          pos += pathDir;
-          steps++;
+        if (possibleDirs.size() != 1) {
+          // Junction found
+          succ.push_back(make_pair(pos, steps));
+          break;
         }
+        pathDir = possibleDirs.front();
+        pos += pathDir;
       }
-      succ.push_back(make_pair(pos, steps));
     }
     return succ;
   };
@@ -109,7 +95,6 @@ struct Path {
 
 int64_t longestPath(const vector<string> &grid) {
   Pos start{1, 0}, goal{ (int)grid[0].size() - 2, (int)grid.size() - 1 };
-  int h = grid.size(), w = grid[0].size();
   auto graph = gridToGraph(grid);
 
   // cout << format("Graph has {} vertices\n", graph.size());

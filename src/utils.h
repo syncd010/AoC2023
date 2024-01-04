@@ -108,6 +108,13 @@ struct vec2 {
     return *this;
   }
 
+  constexpr vec2 operator-() const {
+      vec2<T> v;
+      v.x = -x;
+      v.y = -y;
+      return v;
+   }
+
   bool operator==(const vec2 &) const = default;
   auto operator<=>(const vec2 &) const = default;
 
