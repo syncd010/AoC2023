@@ -23,11 +23,11 @@ vector<pair<Pos, Dir>> parseInput(const string &input) {
   return toVector(input
     | splitString('\n')
     | views::transform([](auto line) {
-      auto parts = toVector(line
-        | splitString('@'));
-      auto pos = toVector(parts[0] | splitNumbers<int64_t>(','));
-      auto dir = toVector(parts[1] | splitNumbers<int64_t>(','));
-      return make_pair(Pos{pos[0], pos[1], pos[2]}, Dir{dir[0], dir[1], dir[2]});
+      auto nums = toVector(line
+        | splitString('@')
+        | views::transform([](auto part) { return toVector(part | splitNumbers<int64_t>(',')); })
+        | views::join);
+      return make_pair(Pos{nums[0], nums[1], nums[2]}, Dir{nums[3], nums[4], nums[5]});
     }));
 }
 
@@ -58,13 +58,25 @@ Result solvePartOne(const string &input) {
 Result solvePartTwo(const string &input) {
   auto stones = parseInput(input);
 
-  cout << "Solved through Wolfram Alpha. Search for 'system of equations' and input the following:\n";
+  cout << "Use a proper tool for the job: install python + sympy and input the following:\n\n";
+  auto times = vector{"t1"s, "t2"s, "t3"s};
+  string sympyEq{""s};
   for (auto i = 0; i < 3; i++) {
-    auto [p, v] = stones[i];
-    auto eq = format("(x-({}))/(a-({}))=(y-({}))/(b-({}))=(z-({}))/(c-({}))", p.x, v.x, p.y, v.y, p.z, v.z);
-    cout << eq << "\n";
-  }
+    auto [p, v] = stones[i+1];
+    auto t = times[i];
+    // cout << format("(x-({}))/(({})-a)=(y-({}))/(({})-b)=(z-({}))/(({})-c)\n", p.x, v.x, p.y, v.y, p.z, v.z);
+    // cout << format("{}=(x-({}))/(({})-a)\n{}==(y-({}))/(({})-b)\n{}==(z-({}))/(({})-c)\n", t, p.x, v.x, t, p.y, v.y, t, p.z, v.z);
 
+    sympyEq += format("(x-({}))/(({})-vx)-{}, (y-({}))/(({})-vy)-{}, (z-({}))/(({})-vz)-{}", p.x, v.x, t, p.y, v.y, t, p.z, v.z, t);
+    if (i!=2) sympyEq += ",";
+  }
+  cout << "from sympy import solve\n";
+  cout << "from sympy import symbols\n";
+  cout << "x,y,z,vx,vy,vz,t1,t2,t3=symbols(\"x,y,z,vx,vy,vz,t1,t2,t3\")\n";
+  cout << format("sol=solve([{}], [x,y,z,vx,vy,vz,t1,t2,t3], dict=True)\n", sympyEq);
+  // cout << "print(sol)\n";
+  cout << "print(\"x: \" + str(sol[0][x]) + \", y: \" + str(sol[0][y]) + \", z: \" + str(sol[0][z]))\n";
+  cout << "print(\"sum: \" + str(sol[0][x] + sol[0][y] + sol[0][z]))\n\n";
   return 261502975177164 + 428589795012222 + 196765966839909;  // 886858737029295
 }
 } // namespace aoc24
