@@ -28,7 +28,7 @@ using PosHash = vec2Hash<int>;
 constexpr auto NORTH = Dir(0, -1), SOUTH = Dir(0, 1), EAST = Dir(1, 0), WEST = Dir(-1, 0);
 
 // Transforms the grid to a graph representation
-auto gridToGraph(const vector<string> &grid) {
+auto gridToGraph(const vector<string> &grid, Pos startPos, Pos goalPos) {
   const auto dirs = vector{EAST, WEST, SOUTH, NORTH};
   const auto forbidden = unordered_map<char, Pos>{ { '>', WEST }, { '<', EAST }, { 'v', NORTH }, { '^', SOUTH } };
   auto validPos = [&forbidden](const vector<string> &grid, Pos pos, Dir dir) {
@@ -37,9 +37,10 @@ auto gridToGraph(const vector<string> &grid) {
       (forbidden.contains(grid[pos.y][pos.x]) && (dir != forbidden.at(grid[pos.y][pos.x]))));
   };
 
+  // Returns the junctions reachable from a given position on the grid
   auto successors = [&grid, &dirs, &validPos](const Pos &origin) {
     vector<pair<Pos, int>> succ{};
-
+    // Follow maze for each direction, starting on origin, until a junction found
     for (auto pathDir : dirs) {
       auto pos = origin + pathDir;
       if (!validPos(grid, pos, pathDir)) continue;
@@ -48,8 +49,7 @@ auto gridToGraph(const vector<string> &grid) {
           | views::filter([&grid, &validPos, &pos, &pathDir](Dir d) {
               return (d != -pathDir) && validPos(grid, pos + d, d);
             }));
-        if (possibleDirs.size() != 1) {
-          // Junction found
+        if (possibleDirs.size() != 1) {   // Junction found
           succ.push_back(make_pair(pos, steps));
           break;
         }
@@ -60,70 +60,99 @@ auto gridToGraph(const vector<string> &grid) {
     return succ;
   };
 
-  deque<Pos> frontier({Pos{ 1, 0 }});
-  unordered_set<Pos, PosHash> explored;
-  unordered_map<Pos, vector<pair<Pos, int>>, PosHash> graph{};
+  // Usual exploration, building the graph and translating Positions to ints
+  unordered_map<Pos, int, PosHash>posToIdx{ { startPos, 0 }, { goalPos, 1 } };
+  vector<Pos> idxToPos{ startPos, goalPos };
+  deque<int> frontier{ posToIdx[startPos] };
+  unordered_set<int> visited{ };
+  vector<vector<pair<int, int>>> graph{ { }, { } };   // Initial elements: startPos, goalPos
   while (!frontier.empty()) {
     auto current = frontier.front();
     frontier.pop_front();
-    graph[current] = successors(current);
-    explored.insert(current);
-    for (auto [pos, steps] : graph[current]) {
-      if (!explored.contains(pos)) {
-        frontier.push_back(pos);
+    visited.insert(current);
+    graph[current] = toVector(
+      successors(idxToPos[current]) 
+      | views::transform([&posToIdx, &idxToPos, &graph](auto p) {
+          // Translate Positions to ints
+          auto [pos, steps] = p;
+          if (!posToIdx.contains(pos)) {
+            posToIdx[pos] = posToIdx.size();
+            idxToPos.push_back(pos);
+            graph.push_back({});
+          }
+          return make_pair(posToIdx[pos], steps);
+        }));
+    for (const auto &[pos, steps] : graph[current]) {
+      if (!visited.contains(pos) && (pos != posToIdx[goalPos])) {
+          frontier.push_back(pos);
       }
     }
   }
-  return graph;
 
-  // Transform to 1D
-  // unordered_map<int, vector<pair<int, int>>> idxGraph{};
-  // for (const auto [pos, val] : graph) {
-  //   vector<pair<int, int>> newVal{};
-  //   for (auto [pos, steps] : val) {
-  //     newVal.push_back(make_pair(pos.toIdx(w), steps));
-  //   }
-  //   idxGraph[pos.toIdx(w)] = newVal;
-  // }
-  // return idxGraph;
+  // Build adjacency matrix
+  auto adjMatrix = vector(graph.size(), vector(graph.size(), 0));
+  for (int i = 0; i < graph.size(); i++) {
+    for (auto [j, v] : graph[i]) {
+      adjMatrix[i][j] = max(adjMatrix[i][j], v);
+    }
+  }
+
+  return make_tuple(graph, adjMatrix, posToIdx, idxToPos);
 }
 
+// Represents a path. Stores the last node, steps taken, 
+// visited nodes as bitset and the max possible remaining steps
 struct Path {
+  int lastNode;
   int steps;
-  vector<Pos> path;
+  uint64_t visited;
+  int maxRemainingSteps;
 };
 
 int64_t longestPath(const vector<string> &grid) {
-  Pos start{1, 0}, goal{ (int)grid[0].size() - 2, (int)grid.size() - 1 };
-  auto graph = gridToGraph(grid);
+  Pos startPos{1, 0}, goalPos{(int)grid[0].size() - 2, (int)grid.size() - 1 };
+  auto [graph, adjMatrix, posToIdx, idxToPos] = gridToGraph(grid, startPos, goalPos);
+  int start = posToIdx[startPos], goal = posToIdx[goalPos];
 
-  // cout << format("Graph has {} vertices\n", graph.size());
+  // Max possible steps through the graph
+  int maxPossibleSteps = 0;
+  for (int i = 0; i < adjMatrix.size(); i++) {
+    for (int j = 0; j < i; j++) {
+      maxPossibleSteps += max(adjMatrix[i][j], adjMatrix[j][i]);
+    }
+  }
 
-  // Generate all paths
-  deque<Path> frontier({Path(0, { start }) });
-  vector<Path> paths{};
+  // Typical DFS to generate all paths
+  deque<Path> frontier({Path(start, 0, 0, maxPossibleSteps) });
+  int maxSteps = 0;
   while (!frontier.empty()) {
     const auto current = frontier.front();
     frontier.pop_front();
-    if (current.path.back() == goal) {
-      paths.push_back(current);
+    if (current.lastNode == goal) {
+      maxSteps = max(maxSteps, current.steps);
       continue;
     }
+    // If current best if >= maximum possible best, ignore this
+    if (current.steps + current.maxRemainingSteps <= maxSteps) continue;
 
-    for (auto [nextPos, nextSteps] : graph[current.path.back()]) {
-      // Detect loops
-      if (find(current.path.begin(), current.path.end(), nextPos) != current.path.end()) {
-        continue;
-      }
-      Path newPath{current};
-      newPath.steps += nextSteps;
-      newPath.path.push_back(nextPos);
-      frontier.push_back(newPath);
+    // Unvisited nodes from the current one
+    auto unvisitedNodes = graph[current.lastNode] | 
+      views::filter([&current](const auto &p) { return !(current.visited & (1L << p.first)); });
+
+    // Sum steps from unvisited nodes
+    auto stepsOnCurrent = 0;
+    for (auto [nextNode, nextSteps] : unvisitedNodes ) {
+      stepsOnCurrent += adjMatrix[nextNode][current.lastNode];
+    }
+
+    for (auto [nextNode, nextSteps] : unvisitedNodes ) {
+      // New path, update steps taken, visited and max remaining steps 
+      // by subtracting all steps from unvisited nodes to the current one
+      Path newPath{nextNode, current.steps + nextSteps, current.visited | (1L << nextNode), current.maxRemainingSteps - stepsOnCurrent};
+      frontier.push_front(newPath);
     }
   }
-  // cout << format("Explored {} paths\n", paths.size());
-
-  return foldLeft(paths, 0, [](auto prev, auto s) { return max(prev, s.steps); });
+  return maxSteps;
 }
 
 Result solvePartOne(const string &input) {

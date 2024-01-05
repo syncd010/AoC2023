@@ -118,18 +118,9 @@ struct vec2 {
   bool operator==(const vec2 &) const = default;
   auto operator<=>(const vec2 &) const = default;
 
-  double distanceTo(const vec2 other) const {
-    T dx = x - other.x, dy = y - other.y;
-    return std::sqrt(dx * dx + dy * dy);
-  }
-
   T manhattanDistanceTo(const vec2 other) const {
     T dx = x - other.x, dy = y - other.y;
     return std::abs(dx) + std::abs(dy);
-  }
-
-  T toIdx(T width) const {
-    return y * width + x;
   }
 };
 
