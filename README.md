@@ -23,7 +23,51 @@ To run, from the root dir:
 This will run the 2 parts of the specified `$day`, using `$file` as input. If no file is specified `./data/input{$day}` is used as input. If no file is specified and `-t` is used, `./data/input{$day}Test` is used instead. 
 
 ## Post event impressions
+Yet another fun event. As has been the norm lately, AoC is extremely polished, with puzzles that are smart, very well specified and with interesting twists.
 
+C++ was a pleasant surprise. I hadn't used it in a long time - well before "modern C++" - and i was expecting it to be though going, but it was surprisingly usable and adequate for these kinds of problems. I mean, the first few days were rough - discovering modern idioms, the ranges library, avoiding common pitfalls -, but it become easier with experience, and i ended up feeling quite comfortable with it. Error messages are still an (almost) undecipherable mess, just pointing in the approximate direction of where the ';' is missing or the template deduction failed, but it gets better after the seeing 1000th one. 
+
+The ranges library is a godsend for this kind of problems, and really contributes to making C++ feel modern, though i missed some things that are to be included in C++23 (enumerate, to, zip, among others). I was also surprised by not having to use pointers not even once: references were enough and move semantics help a lot. One still needs to be aware of the lifetime of objects and were they are being allocated, but that becomes relatively easy by following the rules and after some experience. GC languages are still less cognitively taxing as all that can safely be ignored, but modern C++ comes very close to that. Overall i found that it is evolving nicely and is currently more "comfortable" than i was expecting. It's definitely a complex language, with some cruft from older times, but that might be the necessary tradeoff for being able to choose the abstraction level at which one develops a solution and, if necessary, drop that level to achieve better performance.
+
+Halfway through the event i decided that, using C++ i was not allowed to have slow  solutions. In previous years with other languages (like Clojure), i could hide behind the fact that maybe the language wasn't suited for that particular type of problem, hence the slow performance, but that justification doesn't apply to C++, as there is always an approach that would make it perform adequately. I was initially aiming for a total runtime of less than 1s, but it become obvious that around 100ms would be possible without too much fuss. This is not a big achievement, i did not optimize for the best possible runtime, but i'm satisfied with the results. There's an intrinsic and inexplicable joy in seeing runtimes improve 10x with a different approach, that is comparable to the initial satisfaction of solving the problem. 
+
+Anyway, my aim was to keep the code readable, the solutions general, use modern C++ and data structures that naturally map to the problem, and only drop the level of abstraction if strictly necessary to get acceptable performance.
+
+The following are aproximate runtimes of each puzzle on a i5-11400, with GCC usind libstdc++ and Clang using libc++, both with -O2:
+
+
+| Day   | Part 1 (GCC) | Part 2 (GCC) | Part 1 (Clang) | Part 2 Clang |
+| :---: | :---:  | :---:  | :---:  | :---:  |
+| 1 | 0.29 | 0.82 | 0.28 | 1.29 |
+| 2 | 1.07 | 0.62 | 1.08 | 0.70 |
+| 3 | 0.48 | 0.36 | 0.48 | 0.35 |
+| 4 | 0.98 | 0.62 | 0.89 | 0.83 |
+| 5 | 0.74 | 0.45 | 0.76 | 0.62 |
+| 6 | 0.02 | 0.00 | 0.03 | 0.00 |
+| 7 | 1.18 | 0.82 | 1.81 | 1.02 |
+| 8 | 1.26 | 2.31 | 1.53 | 2.39 |
+| 9 | 0.64 | 0.62 | 0.65 | 0.59 |
+| 10 | 1.56 | 0.61 | 1.71 | 0.63 |
+| 11 | 0.70 | 0.28 | 0.67 | 0.65 |
+| 12 | 1.10 | 7.34 | 2.08 | 8.85 |
+| 13 | 0.41 | 0.52 | 0.51 | 0.56 |
+| 14 | 0.31 | 23.90 | 0.35 | 29.54 |
+| 15 | 0.46 | 0.98 | 0.36 | 0.92 |
+| 16 | 0.29 | 9.84 | 0.31 | 11.73 |
+| 17 | 9.98 | 12.68 | 11.55 | 13.40 |
+| 18 | 0.17 | 0.18 | 0.18 | 0.21 |
+| 19 | 1.25 | 0.79 | 1.82 | 1.02 |
+| 20 | 1.53 | 3.53 | 1.59 | 3.36 |
+| 21 | 1.08 | 7.23 | 1.32 | 9.02 |
+| 22 | 1.09 | 2.92 | 1.70 | 2.71 |
+| 23 | 5.14 | 12.03 | 6.98 | 14.52 |
+| 24 | 1.60 | 0.11 | 1.75 | 0.11 |
+| 25* | 1.06 | - | 1.07 | - |
+| **Total** | **34.39 ms** | **89.56 ms** | **41.46 ms** | **105.02 ms** |
+
+(For day 25 i only considered the most performing approach, which was implemented as part two of that day)
+
+In the end, it was slightly above 100 ms for both parts. Good enough, the 100 ms could be achieved by further improving day 14 particularly (or simply using a better cpu, given that the i5 11400 isn't exactly top of the line). Also interesting that gcc with libstdc++ generates code about 15% quicker than clang with libc++.
 
 ---
 
