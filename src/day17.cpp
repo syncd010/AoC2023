@@ -59,7 +59,7 @@ inline Dir rotate(const Dir &pos, int dir = 1) {
 }
 
 auto successors(const State &state, const auto &grid, int minSteps, int maxSteps) {
-  vector<State> successors{};
+  auto successors = vector<State>{};
   // Generate all possible successors: turns between minSteps and maxSteps
   int cost = state.cost;
   auto pos = state.pos + state.dir;
@@ -80,8 +80,9 @@ Result solve(const string &input, int minSteps = 1, int maxSteps = 3) {
   auto grid = parseInput(input);
   auto h = grid.size(), w = grid[0].size();
 
-  Pos finalPos{(int)w - 1, (int)h - 1};
-  State startEast{Pos{0, 0}, Dir{1, 0}, 0}, startSouth{Pos{0, 0}, Dir{0, 1}, 0};
+  auto finalPos = Pos{(int)w - 1, (int)h - 1};
+  auto startEast = State{Pos{0, 0}, Dir{1, 0}, 0}, 
+       startSouth = State{Pos{0, 0}, Dir{0, 1}, 0};
   auto comparisonFn = [](const State &s1, const State &s2) noexcept {
     return s1.cost > s2.cost;     // Minimum cost
   };

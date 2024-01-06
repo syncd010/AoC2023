@@ -30,10 +30,10 @@ vector<Instruction> parseInput(const string &input) {
 }
 
 vector<Pos> getVertices(const vector<Instruction> &inst) {
-  unordered_map<char, Dir> dirMap{ { 'R', Dir{1, 0} }, { 'L', Dir{-1, 0} }, { 'D', Dir{0, 1} }, { 'U', Dir{0, -1} }, };
+  auto dirMap = unordered_map<char, Dir>{ { 'R', Dir{1, 0} }, { 'L', Dir{-1, 0} }, { 'D', Dir{0, 1} }, { 'U', Dir{0, -1} }, };
 
-  Pos pos{0, 0};
-  vector<Pos> vertices{};
+  auto pos = Pos{0, 0};
+  auto vertices = vector<Pos>{};
   for (auto [dir, steps, color] : inst) {
     pos += dirMap[dir] * steps;
     vertices.push_back(pos);
@@ -43,7 +43,7 @@ vector<Pos> getVertices(const vector<Instruction> &inst) {
 
 int64_t getArea(vector<Pos> vertices) {
   // Shoelace formula
-  size_t sz = vertices.size();
+  auto sz = vertices.size();
   int64_t shoelaces = 0, boundary = 0;
   for (int i = 0; i < sz; i++) {
     shoelaces += vertices[i].x * vertices[(i + 1) % sz].y - vertices[(i + 1) % sz].x * vertices[i].y;
@@ -62,8 +62,8 @@ Result solvePartOne(const string &input) {
 Result solvePartTwo(const string &input) {
   auto inst = parseInput(input);
 
-  unordered_map<char, char> colorMap = { { '0', 'R' }, { '1', 'D' }, { '2', 'L' }, { '3', 'U' }, };
-  vector<Instruction> newInst{};
+  auto colorMap = unordered_map<char, char>{ { '0', 'R' }, { '1', 'D' }, { '2', 'L' }, { '3', 'U' }, };
+  auto newInst = vector<Instruction>{};
   for (auto [dir, steps, color] : inst) {
     newInst.push_back(Instruction(colorMap[color.back()], ston<int>(color.substr(1, 5), 16), color));
   }

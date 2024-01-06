@@ -28,12 +28,12 @@ constexpr auto
   WEST = Dir(-1, 0);
 
 int64_t countEnergized(const vector<string_view> &grid, Pos startPos, Dir startDir) {
-  int h = grid.size(), w = grid[0].size();
+  auto h = (int)grid.size(), w = (int)grid[0].size();
   // char visitedGrid[h][w]{};
   auto visitedGrid = vector(h, vector<char>(w, 0));
   // Keep a list of rays currently traveling
-  vector<pair<Pos, Dir>> rays{ make_pair(startPos, startDir) };
-  int energized = 0;
+  auto rays = vector<pair<Pos, Dir>>{ make_pair(startPos, startDir) };
+  auto energized = int64_t{ 0 };
   while (!rays.empty()) {
     auto [pos, dir] = rays.back();
     rays.pop_back();
@@ -91,7 +91,7 @@ Result solvePartTwo(const string &input) {
   auto grid = toVector(input | splitString('\n'));
 
   // Entry points along border
-  vector<pair<Pos, Dir>> entries{};
+  auto entries = vector<pair<Pos, Dir>>{};
   int h = grid.size(), w = grid[0].size();
   for (int y = 0; y < h; y++) {
     entries.push_back(make_pair(Pos{0, y}, EAST));

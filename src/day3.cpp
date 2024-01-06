@@ -16,7 +16,7 @@ using namespace aoc;
 vector<int> findNums(const string &input, bool partTwoRules = false) {
   auto engine = toVector(input | splitString('\n'));
   int w = engine[0].size(), h = engine.size();
-  vector<int> res{};
+  auto res = vector<int>{};
 
   for (int y = 0; y < h; y++) {
     for (int x = 0; x < w; x++) {
@@ -24,7 +24,7 @@ vector<int> findNums(const string &input, bool partTwoRules = false) {
         continue;
 
       // Visit adjacent cells, finding values
-      vector<int> adjacent{};
+      auto adjacent = vector<int>{};
       for (int dy = -1; dy <= 1; dy++) {
         if (y+dy < 0 || y + dy >= h) continue;
         for (int dx = -1; dx <= 1; dx++) {

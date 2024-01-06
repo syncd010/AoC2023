@@ -42,7 +42,7 @@ Result solvePartOne(const string &input) {
 
 Result solvePartTwo(const string &input) {
   auto winnerCounts = toVector(parseInput(input));
-  vector cards(winnerCounts.size(), 1);
+  auto cards = vector(winnerCounts.size(), 1);
 
   // Propagate numbers to following cards
   for (int i = 0; i < winnerCounts.size(); i++) {

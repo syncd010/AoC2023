@@ -35,7 +35,7 @@ Result solvePartOne(const string &input) {
   constexpr int64_t m = 200000000000000, M = 400000000000000;
 
   auto stones = parseInput(input);
-  int64_t res = 0;
+  auto res = int64_t{0};
   for (int i = 0; i < stones.size(); i++) {
     auto [p1, v1] = stones[i];
     auto s1 = (double)v1.y / (double)v1.x;    // Slope
@@ -43,10 +43,10 @@ Result solvePartOne(const string &input) {
       auto [p2, v2] = stones[j];
       auto s2 = (double)v2.y / (double)v2.x;
       if (s1 == s2) continue;   // Parallel lines
-      double x = (p2.y - p1.y - s2 * p2.x + s1 * p1.x) / (s1 - s2);
-      double t1 = (x - p1.x) / v1.x, t2 = (x - p2.x) / v2.x;
+      auto x = (p2.y - p1.y - s2 * p2.x + s1 * p1.x) / (s1 - s2);
+      auto t1 = (x - p1.x) / v1.x, t2 = (x - p2.x) / v2.x;
       if (t1 < 0 || t2 < 0) continue;
-      double y = p1.y + v1.y * t1;
+      auto y = p1.y + v1.y * t1;
 
       res += (x >= m && x <= M && y >= m && y <= M);
     }

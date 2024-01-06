@@ -30,8 +30,8 @@ pair<Workflows, vector<Part>> parseInput(const string &input) {
     | splitString('\n', true);
 
   // Somewhat messy but it is what it is
-  Workflows workflows{};
-  vector<Part> parts{};
+  auto workflows = Workflows{};
+  auto parts = vector<Part>{};
   bool inRules = true;
   for (auto line : splits) {
     if (line.empty()) {
@@ -43,7 +43,7 @@ pair<Workflows, vector<Part>> parseInput(const string &input) {
       auto sep = line.find('{');
       auto name = line.substr(0, sep);
       auto spec = line.substr(sep + 1, line.size() - sep - 2);
-      vector<Rule> rules = {};
+      auto rules = vector<Rule>{};
       for (auto ruleStr : spec | splitString(',')) {
         auto sep = ruleStr.find(':');
         if (sep != ruleStr.npos) {
@@ -55,7 +55,7 @@ pair<Workflows, vector<Part>> parseInput(const string &input) {
       workflows[name] = rules;
     } else {
       // Parsing parts section of the input
-      Part part{};
+      auto part = Part{};
       for (auto p : line.substr(1, line.size() - 2) | splitString(',')) {
         part[p[0]] = ston<int>(p.substr(2));
       }
@@ -79,7 +79,7 @@ Result solvePartOne(const string &input) {
   auto [workflows, parts] = parseInput(input);
 
   // Pass each part through the workflow collecting the accepted ones
-  vector<Part> accepted;
+  auto accepted = vector<Part>{};
   for (const auto &part : parts) {
     bool finished = false;
     auto wf = workflows["in"];
@@ -104,7 +104,7 @@ using Hypercube = unordered_map<char, pair<int, int>>;
 
 // Splices the hypercube along the rule dimension
 pair<Hypercube, Hypercube> spliceCube(Hypercube cube, Rule rule) {
-  Hypercube cubeInv = cube;
+  auto cubeInv = cube;
   auto &limit = cube[rule.lhs], &limitInv = cubeInv[rule.lhs];
   if (rule.op == '>') {
     limit.first = max(limit.first, rule.rhs + 1);
@@ -118,7 +118,7 @@ pair<Hypercube, Hypercube> spliceCube(Hypercube cube, Rule rule) {
 
 Result solvePartTwo(const string &input) {
   auto [workflows, parts] = parseInput(input);
-  vector<pair<string_view, Hypercube>> frontier{ { 
+  auto frontier = vector<pair<string_view, Hypercube>>{ { 
   {"in", {
     { 'x', { 1, 4001 } },
     { 'm', { 1, 4001 } },

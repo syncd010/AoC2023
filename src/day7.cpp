@@ -25,7 +25,7 @@ public:
     typeScore = useJokers ? scoreWithJokers(h) : score(h);
     // Substitute AKQJT for chars in lexicographic order, so that we can
     // later simply compare 2 strings and get a ordering out of them
-    unordered_map<char, char> valueMap{{'A', 'e'}, {'K', 'd'}, {'Q', 'c'}, {'J', useJokers ? '0' : 'b'}, {'T', 'a'}};
+    auto valueMap = unordered_map<char, char>{{'A', 'e'}, {'K', 'd'}, {'Q', 'c'}, {'J', useJokers ? '0' : 'b'}, {'T', 'a'}};
     ranges::copy(hand 
       | views::transform([&valueMap](char c) {
         return valueMap.contains(c) ? valueMap[c] : c;
@@ -46,7 +46,7 @@ private:
 
   static int score(string_view hand) {
     // Calculate hand typeScore, by checking how many different cards there are
-    unordered_map<char, int> cardCounts;
+    auto cardCounts = unordered_map<char, int>{};
     for (char c : hand) cardCounts[c]++;
     return accumulate(hand.begin(), hand.end(), 0, [&cardCounts](int p, char c) { return p + cardCounts[c]; } );
   }
@@ -61,7 +61,7 @@ private:
     // Substitute jokers and get the maximum score
     int maxScore = 0;
     for (char c : uniqueChars) {
-      string newHand{hand};
+      auto newHand = string{hand};
       replace(newHand.begin(), newHand.end(), 'J', c);
       maxScore = max(maxScore, score(newHand));
     }

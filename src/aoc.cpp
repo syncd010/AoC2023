@@ -16,7 +16,7 @@ using namespace aoc;
 
 int main(const int argc, const char *const argv[]) {
 
-  const vector<string_view> args(argv + 1, argv + argc);
+  const auto args = vector<string_view>(argv + 1, argv + argc);
 
   bool useTestFile = false;
   string day{}, filePath{};
@@ -44,14 +44,14 @@ int main(const int argc, const char *const argv[]) {
     filePath = "data/input" + day + (useTestFile ? "Test" : "");
   }
 
-  ifstream fs(filePath);
+  auto fs = ifstream(filePath);
   if (!fs.is_open()) {
     cout << "Error: cannot open input file: " + filePath;
     return EXIT_FAILURE;
   }
 
   // Read whole file
-  stringstream buffer;
+  auto buffer = stringstream{};
   buffer << fs.rdbuf();
   fs.close();
   const auto input = buffer.str();
@@ -59,7 +59,7 @@ int main(const int argc, const char *const argv[]) {
   auto execSolve = [](auto solveFunc, const string &input, const string &partDesc) {
 
     auto t1 = chrono::high_resolution_clock::now();
-    Result res = solveFunc(input);
+    auto res = solveFunc(input);
     auto t2 = chrono::high_resolution_clock::now();
     auto ms = (double)duration_cast<chrono::microseconds>(t2 - t1).count() / 1000;
 

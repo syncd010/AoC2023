@@ -32,16 +32,16 @@ constexpr char START = 'S', ROCK = '#', EMPTY = '.';
 
 // Returns the active nodes on the grid, with max steps limit
 auto countActive(const vector<string_view> &grid, int maxSteps, bool infiniteBoard) {
-  int h = grid.size(), w = grid[0].size();  
-  Pos startPos{h / 2, w / 2};
+  auto h = (int)grid.size(), w = (int)grid[0].size();  
+  auto startPos = Pos{h / 2, w / 2};
   const auto dirs = vector{EAST, WEST, SOUTH, NORTH};
-  deque<pair<Pos, int>> frontier{ {startPos, 0 }};
-  int vh = 2 * (maxSteps + 1), vw = 2 * (maxSteps + 1);
-  int cy = (vh - h) / 2, cx = (vw - w) / 2;
+  auto frontier = deque<pair<Pos, int>>{ {startPos, 0 }};
+  auto vh = 2 * (maxSteps + 1), vw = 2 * (maxSteps + 1);
+  auto cy = (vh - h) / 2, cx = (vw - w) / 2;
   auto visited = vector(vh, vector(vw, -1));
   visited[cy + startPos.y][cx + startPos.x] = 0;
 
-  int64_t active = (maxSteps % 2 == 0);
+  auto active = int64_t{ maxSteps % 2 == 0 };
   while (!frontier.empty()) {
     auto [p, step] = frontier.front();
     frontier.pop_front();
@@ -72,10 +72,10 @@ Result solvePartOne(const string &input) {
 // Lagrange interpolation polynomial
 auto lagrangePoly(const vector<int64_t> &xs, const vector<int64_t> &ys) {
   return [&xs, &ys](int64_t x) {
-    int n = xs.size();
-    int64_t sum = 0;
+    auto n = xs.size();
+    auto sum = int64_t{ 0 };
     for (int j = 0; j < n; j++) {
-      int64_t prod = 1;
+      auto prod = int64_t{ 1 };
       for (int i = 0; i < n; i++) {
         if (i == j) continue;
         prod *= (x - xs[i])/(xs[j] - xs[i]);
@@ -88,9 +88,9 @@ auto lagrangePoly(const vector<int64_t> &xs, const vector<int64_t> &ys) {
 
 Result solvePartTwo(const string &input) {
   auto grid = toVector(input | splitString<string_view>('\n'));
-  int h = grid.size(), halfH = h / 2;
-  vector<int64_t> xs{h/2, h/2 + h, h/2 + 2*h};
-  vector<int64_t> ys = toVector(xs | views::transform([&grid](auto x) { return countActive(grid, x, true); }));
+  auto h = (int)grid.size(), halfH = h / 2;
+  auto xs = vector<int64_t>{h/2, h/2 + h, h/2 + 2*h},
+       ys = toVector(xs | views::transform([&grid](auto x) { return countActive(grid, x, true); }));
   
   return lagrangePoly(xs, ys)(26501365);
 

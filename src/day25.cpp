@@ -22,11 +22,11 @@ using Graph = unordered_map<int, vector<int>>;
 
 // Parses input into a graph. Changes vertices names to ints for performance
 Graph parseInput(const string &input) {
-  Graph graph;
+  auto graph = Graph{};
   auto lines = toVector(input | splitString('\n'));
-  unordered_map<string_view, int> mapIds{};
+  auto mapIds = unordered_map<string_view, int>{};
 
-  int nextId = 0;
+  auto nextId = 0;
   auto lookupOrInsert = [&mapIds, &nextId](string_view s) {
     if (!mapIds.contains(s)) mapIds[s] = nextId++;
     return mapIds[s];
@@ -50,7 +50,7 @@ Graph parseInput(const string &input) {
 // Implements Karger's algorithm until 2 nodes remain.
 // Returns the flow between the 2 cuts and their sizes
 tuple<int, int, int> kargers(Graph graph) {
-  const int sz = graph.size();
+  const auto sz = graph.size();
   auto vertCounts = vector(sz, 1);
 
   // Contract graph until 2 vertices remain    
@@ -87,9 +87,9 @@ Result solvePartOne(const string &input) {
 
 // Returns a path from src to dst
 vector<int> bfsPath(const Graph &graph, int src, int dst) {
-  unordered_map<int, int> visited{ { src, -1 } };
-  vector<int> frontier{src};
-  int sp = 0;
+  auto visited = unordered_map<int, int>{ { src, -1 } };
+  auto frontier = vector<int>{src};
+  auto sp = 0;
   while (sp < frontier.size()) {
     auto curr = frontier[sp++];
     if (curr == dst) break;
@@ -114,7 +114,7 @@ vector<int> bfsPath(const Graph &graph, int src, int dst) {
 
 // Removes flow edges from the path from src to sink
 // Returns the number of nodes reachable from src after the removal
-int removeFlow(Graph graph, int src, int sink, int flow) {
+auto removeFlow(Graph graph, int src, int sink, int flow) {
     for(int i = 0; i < flow; i++) {
       auto path = bfsPath(graph, src, sink);
       auto prev = path[0];
@@ -132,7 +132,7 @@ int removeFlow(Graph graph, int src, int sink, int flow) {
 Result solvePartTwo(const string &input) {
   srand(time(0));
   auto graph = parseInput(input);
-  int sz = graph.size();
+  auto sz = graph.size();
   auto reachable = sz;
   auto src = graph.begin()->first;
   while (reachable == sz) {
@@ -141,6 +141,6 @@ Result solvePartTwo(const string &input) {
     // auto sink = bfsPath(graph, src, -1).back();
     reachable = removeFlow(graph, src, sink, 3);
   }
-  return reachable * (sz - reachable);
+  return (int64_t)(reachable * (sz - reachable));
 }
 } // namespace aoc25

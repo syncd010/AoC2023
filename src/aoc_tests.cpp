@@ -69,13 +69,13 @@ vector<tuple<string, Result, Result>> dataFiles{
 };
 
 string readFile(const string &filePath) {
-    ifstream fs(filePath);
+    auto fs = ifstream(filePath);
     if (!fs.is_open()) {
         cout << "Error: cannot open input file: " + filePath + "\n";
         return string{};
     }
     // Read whole file
-    stringstream buffer;
+    auto buffer = stringstream{};
     buffer << fs.rdbuf();
     fs.close();
     return buffer.str();
@@ -86,8 +86,8 @@ string readFile(const string &filePath) {
         int idx = stoi(#macro_day) - 1;                         \
         string input = readFile(get<0>(testFiles[idx]));        \
         ASSERT_TRUE(!input.empty());                            \
-        Result part1 = aoc##macro_day::solvePartOne(input);     \
-        Result part2 = aoc##macro_day::solvePartTwo(input);     \
+        auto part1 = aoc##macro_day::solvePartOne(input);       \
+        auto part2 = aoc##macro_day::solvePartTwo(input);       \
         EXPECT_EQ(part1, get<1>(testFiles[idx]));               \
         EXPECT_EQ(part2, get<2>(testFiles[idx]));               \
     }
@@ -97,8 +97,8 @@ string readFile(const string &filePath) {
         int idx = stoi(#macro_day) - 1;                         \
         string input = readFile(get<0>(dataFiles[idx]));        \
         ASSERT_TRUE(!input.empty());                            \
-        Result part1 = aoc##macro_day::solvePartOne(input);     \
-        Result part2 = aoc##macro_day::solvePartTwo(input);     \
+        auto part1 = aoc##macro_day::solvePartOne(input);       \
+        auto part2 = aoc##macro_day::solvePartTwo(input);       \
         EXPECT_EQ(part1, get<1>(dataFiles[idx]));               \
         EXPECT_EQ(part2, get<2>(dataFiles[idx]));               \
     }

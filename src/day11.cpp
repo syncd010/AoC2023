@@ -20,8 +20,8 @@ using Pos = vec2<int64_t>;
 constexpr int64_t EXP_FACTOR = 100;
 
 vector<int64_t> findEmptyRows(const auto &board) {
-  vector<int64_t> empty{};
-  for (size_t i = 0; i < board.size(); i++) {
+  auto empty = vector<int64_t>{};
+  for (auto i = 0; i < board.size(); i++) {
     if (ranges::all_of(board[i], [](char c) { return c == '.';})) {
       empty.push_back(i);
     }
@@ -31,15 +31,15 @@ vector<int64_t> findEmptyRows(const auto &board) {
 
 Result solve(const string &input, int64_t expandFactor = 1) {
   auto board = toVector(input | splitString('\n'));
-  size_t h = board.size(), w = board[0].size();
+  auto h = board.size(), w = board[0].size();
   // Find empty rows and columns
-  vector<int64_t> emptyRows = findEmptyRows(board), 
-                  emptyCols = findEmptyRows(transposeBoard(board));
+  auto emptyRows = findEmptyRows(board), 
+       emptyCols = findEmptyRows(transposeBoard(board));
 
   // Find positions
-  vector<Pos> positions{};
-  for (size_t y = 0; y < h; y++) {
-    for (size_t x = 0; x < w; x++) {
+  auto positions = vector<Pos>{};
+  for (auto y = 0; y < h; y++) {
+    for (auto x = 0; x < w; x++) {
       if (board[y][x] == '#') positions.push_back(Pos(x, y));
     }
   }
@@ -55,9 +55,9 @@ Result solve(const string &input, int64_t expandFactor = 1) {
     }));
 
   // Calculate Manhattan Distance between pairs of positions
-  int64_t res = 0;
-  for (size_t i = 0; i < expandedPositions.size() - 1; i++) {
-    for (size_t j = i+1; j < expandedPositions.size(); j++) {
+  auto res = int64_t{0};
+  for (auto i = 0; i < expandedPositions.size() - 1; i++) {
+    for (auto j = i+1; j < expandedPositions.size(); j++) {
       res += expandedPositions[i].manhattanDistanceTo(expandedPositions[j]);
     }
   }

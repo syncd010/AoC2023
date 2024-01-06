@@ -17,7 +17,7 @@ using namespace aoc;
 
 // Returns a vector of the differences
 vector<int64_t> diff(const vector<int64_t> &in) {
-  vector<int64_t> out(in.size() - 1);
+  auto out = vector<int64_t>(in.size() - 1);
   for (int i = 0; i < in.size() - 1; i++) {
     out[i] = in[i+1] - in[i];
   }
@@ -27,9 +27,9 @@ vector<int64_t> diff(const vector<int64_t> &in) {
 // Return next element in sequence, assumes one of the derivatives is constant
 int64_t nextInSequence(const vector<int64_t> &sequence) { 
   // Get derivatives until 0, sum last difference
-  vector<int64_t> dSeq = sequence;
-  int64_t lastDiff = 0;
-  while (!ranges::all_of(dSeq, [](int64_t n) { return n == 0; })) {
+  auto dSeq = sequence;
+  auto lastDiff = int64_t{0};
+  while (!ranges::all_of(dSeq, [](auto n) { return n == 0; })) {
     dSeq = diff(dSeq);
     lastDiff += dSeq.back();
   }

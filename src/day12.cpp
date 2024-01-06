@@ -26,10 +26,10 @@ inline int64_t cantorPairingFunction(int64_t k1, int64_t k2) {
 
 // Calculates the possible combinations starting on recPos and groupPos
 int64_t calcCombinations(string_view record, const vector<int> &groups, int recPos = 0, int groupPos = 0) {
-  int thisGroup = groups[groupPos];
+  auto thisGroup = groups[groupPos];
   // Estimate the space needed at the end for the remaining groups
-  int spacer = accumulate(groups.begin() + groupPos, groups.end(), 0) + groups.size() - 1 - groupPos;
-  int64_t combinations = 0;
+  auto spacer = accumulate(groups.begin() + groupPos, groups.end(), 0) + groups.size() - 1 - groupPos;
+  auto combinations = int64_t{ 0 };
   // Loop on each character, checking if the current group can be placed there
   for (int pos = recPos; pos <= record.size() - spacer; pos++) {
     bool fits = record.find('.', pos) >= pos + thisGroup && 
@@ -44,7 +44,7 @@ int64_t calcCombinations(string_view record, const vector<int> &groups, int recP
         if (!poundsRemaining) combinations++;
       } else {
         // Recurse, but check cache first
-        int nextRecPos = pos + thisGroup + 1, nextGroupPos = groupPos + 1;
+        auto nextRecPos = pos + thisGroup + 1, nextGroupPos = groupPos + 1;
         auto cacheKey = cantorPairingFunction(nextRecPos, nextGroupPos);
         if (!cache.contains(cacheKey)) {
           cache[cacheKey] = calcCombinations(record, groups, nextRecPos, nextGroupPos);
@@ -83,8 +83,8 @@ Result solvePartTwo(const string &input) {
     | views::transform([](auto pair) {
       cache.clear();    // Clear cache on each line
       // Expand input by 5
-      string records{pair.first};
-      vector<int> groups{pair.second};
+      auto records = string{ pair.first };
+      auto groups = vector<int>{ pair.second };
       for (int i = 0; i < 4; i++) {
         records.append("?").append(pair.first);
         groups.insert(groups.end(), pair.second.begin(), pair.second.end());

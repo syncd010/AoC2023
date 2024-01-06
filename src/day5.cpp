@@ -26,9 +26,9 @@ pair<vector<int64_t>, vector<AlmanacMap>> parseInput(const string &input) {
   auto lines = input | splitString('\n');
   auto seeds = toVector(lines.front().substr(6) | splitNumbers<int64_t>(' '));
 
-  vector<AlmanacMap> allMaps{};
+  auto allMaps = vector<AlmanacMap>{};
   for (auto l : lines | views::drop(1)) {
-    size_t tokenPos = l.find(" map:");
+    auto tokenPos = l.find(" map:");
     if (tokenPos != string::npos) {
       auto newMap = AlmanacMap(l.substr(0, tokenPos), {});
       allMaps.push_back(newMap);
@@ -47,7 +47,7 @@ Result solvePartOne(const string &input) {
   auto mappedSeeds = seeds | views::transform([&allMaps](auto seed) {
       for (auto singleMap : allMaps) {
         for (auto m : singleMap.mappings) {
-          int64_t start = m[1], len = m[2], end = start + len, convert = m[0];
+          auto start = m[1], len = m[2], end = start + len, convert = m[0];
           if (seed >= start && seed < end) {
             seed += convert - start;
             break;
@@ -63,7 +63,8 @@ Result solvePartOne(const string &input) {
 Result solvePartTwo(const string &input) {
   auto [auxSeeds, allMaps] = parseInput(input);
 
-  vector<pair<int64_t, int64_t>> seeds, mappedSeeds{};
+  auto seeds = vector<pair<int64_t, int64_t>>{}, 
+       mappedSeeds = vector<pair<int64_t, int64_t>>{};
   // Join seeds in pairs [start, len)
   for (int i = 0; i < auxSeeds.size(); i += 2) {
     seeds.push_back(make_pair(auxSeeds[i], auxSeeds[i+1]));

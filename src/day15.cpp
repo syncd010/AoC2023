@@ -37,7 +37,7 @@ inline tuple<string_view, char, int>destructure(const string_view step) {
 Result solvePartTwo(const string &input) {
   auto steps = input
     | splitString(',');
-  vector<vector<pair<string_view, int>>> boxes(256);
+  auto boxes = vector<vector<pair<string_view, int>>>(256);
 
   for (auto s : steps) {
     auto [label, op, val] = destructure(s);
@@ -54,7 +54,7 @@ Result solvePartTwo(const string &input) {
     }
   }
 
-  int64_t res = 0;
+  auto res = int64_t{ 0 };
   for (int i = 0; i < boxes.size(); i++) {
     for (int j = 0; j < boxes[i].size(); j++) {
       res += (i+1) * (j+1) * boxes[i][j].second;

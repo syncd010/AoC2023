@@ -39,7 +39,7 @@ auto gridToGraph(const vector<string> &grid, Pos startPos, Pos goalPos) {
 
   // Returns the junctions reachable from a given position on the grid
   auto successors = [&grid, &dirs, &validPos](const Pos &origin) {
-    vector<pair<Pos, int>> succ{};
+    auto succ = vector<pair<Pos, int>>{};
     // Follow maze for each direction, starting on origin, until a junction found
     for (auto pathDir : dirs) {
       auto pos = origin + pathDir;
@@ -61,11 +61,11 @@ auto gridToGraph(const vector<string> &grid, Pos startPos, Pos goalPos) {
   };
 
   // Usual exploration, building the graph and translating Positions to ints
-  unordered_map<Pos, int, PosHash>posToIdx{ { startPos, 0 }, { goalPos, 1 } };
-  vector<Pos> idxToPos{ startPos, goalPos };
-  deque<int> frontier{ posToIdx[startPos] };
-  unordered_set<int> visited{ };
-  vector<vector<pair<int, int>>> graph{ { }, { } };   // Initial elements: startPos, goalPos
+  auto posToIdx = unordered_map<Pos, int, PosHash>{ { startPos, 0 }, { goalPos, 1 } };
+  auto idxToPos = vector<Pos>{ startPos, goalPos };
+  auto frontier = deque<int>{ posToIdx[startPos] };
+  auto visited = unordered_set<int>{ };
+  auto graph = vector<vector<pair<int, int>>>{ { }, { } };   // Initial elements: startPos, goalPos
   while (!frontier.empty()) {
     auto current = frontier.front();
     frontier.pop_front();
@@ -110,12 +110,13 @@ struct Path {
 };
 
 int64_t longestPath(const vector<string> &grid) {
-  Pos startPos{1, 0}, goalPos{(int)grid[0].size() - 2, (int)grid.size() - 1 };
+  auto startPos = Pos{1, 0}, 
+       goalPos = Pos{(int)grid[0].size() - 2, (int)grid.size() - 1 };
   auto [graph, adjMatrix, posToIdx, idxToPos] = gridToGraph(grid, startPos, goalPos);
-  int start = posToIdx[startPos], goal = posToIdx[goalPos];
+  auto start = posToIdx[startPos], goal = posToIdx[goalPos];
 
   // Max possible steps through the graph
-  int maxPossibleSteps = 0;
+  auto maxPossibleSteps = 0;
   for (int i = 0; i < adjMatrix.size(); i++) {
     for (int j = 0; j < i; j++) {
       maxPossibleSteps += max(adjMatrix[i][j], adjMatrix[j][i]);
@@ -123,8 +124,8 @@ int64_t longestPath(const vector<string> &grid) {
   }
 
   // Typical DFS to generate all paths
-  deque<Path> frontier({Path(start, 0, 0, maxPossibleSteps) });
-  int maxSteps = 0;
+  auto frontier = deque<Path>{Path(start, 0, 0, maxPossibleSteps) };
+  auto maxSteps = 0;
   while (!frontier.empty()) {
     const auto current = frontier.front();
     frontier.pop_front();

@@ -40,7 +40,7 @@ struct Pulse {
 // Creates a map of the circuit
 Circuit parseInput(const string &input) {
   auto lines = toVector(input | splitString('\n'));
-  Circuit gates{};
+  auto gates = Circuit{};
 
   // Create gates and output circuit
   for (auto line : lines) {
@@ -67,7 +67,7 @@ Circuit parseInput(const string &input) {
 
 // Processes a pulse, updating the circuit. Returns whether there was a switch
 bool processPulse(const Pulse &pulse) {
-  Gate &sourceGate = pulse.sourceGate, &destGate = pulse.destGate;
+  auto &sourceGate = pulse.sourceGate, &destGate = pulse.destGate;
   bool switched = true;
 
   if (destGate.type == '%') {
@@ -91,16 +91,16 @@ bool processPulse(const Pulse &pulse) {
 // Runs a cycle of a button push
 // Updates the circuit with the state and returns the pulses generated
 vector<Pulse> pushTheButton(Circuit &gates) {
-  queue<reference_wrapper<Gate>> frontier({ gates.at("broadcaster"sv) });
-  vector<Pulse> pulses{};
+  auto frontier = queue<reference_wrapper<Gate>>({ gates.at("broadcaster"sv) });
+  auto pulses = vector<Pulse>{};
   while (!frontier.empty()) {
     auto &sourceGate = frontier.front().get();
     frontier.pop();
 
     for (auto destGate : sourceGate.outputGates) {
-      Pulse pulse{sourceGate, destGate, sourceGate.state};
+      auto pulse = Pulse{sourceGate, destGate, sourceGate.state};
       pulses.push_back(pulse);
-      bool switched = processPulse(pulse);
+      auto switched = processPulse(pulse);
       if (switched) frontier.push(destGate);
     }
   }
@@ -133,7 +133,7 @@ Result solvePartTwo(const string &input) {
   // LL gets its input from 4 gates, which form 4 distinct chains from the start. 
   // LL will be on (and RX off) only when all 4 inputs are on, so calculate the 
   // length of the 4 loops (which is prime) and return its lcm
-  unordered_map<string_view, int> rxChains{};
+  auto rxChains = unordered_map<string_view, int>{};
   for (auto s : gates[gates["rx"].inputIds.front()].inputIds) {
     rxChains[s] = 0;
   }

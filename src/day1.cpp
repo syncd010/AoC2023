@@ -27,14 +27,15 @@ Result solvePartOne(const string &input) {
 }
 
 Result solvePartTwo(const string &input) {
-  map<string, char> digits{{"one", '1'},   {"two", '2'},   {"three", '3'},
-                           {"four", '4'},  {"five", '5'},  {"six", '6'},
-                           {"seven", '7'}, {"eight", '8'}, {"nine", '9'}};
+  auto digits = map<string, char> 
+    {{"one", '1'},   {"two", '2'},   {"three", '3'}, 
+     {"four", '4'},  {"five", '5'}, {"six", '6'}, 
+     {"seven", '7'}, {"eight", '8'}, {"nine", '9'}};
 
   // Substitute names for digits
-  string converted{input};
+  auto converted = string{input};
   for (auto d : digits) {
-    size_t pos = 0;
+    auto pos = 0;
     while ((pos = converted.find(d.first, pos)) != std::string::npos) {
       converted.insert(converted.begin() + pos + 1, 1, d.second);
       pos += 2;

@@ -51,11 +51,11 @@ vector<Game> parseInput(const string &input) {
 Result solvePartOne(const string &input) {
   auto possibleGames = parseInput(input)
     | views::filter([](Game g) {   // Filter possible games, according to the rules
-      const unordered_map<string_view, int> possible = {{"red", 12}, {"blue", 14}, {"green", 13}};
+      const auto possible = unordered_map<string_view, int>{{"red", 12}, {"blue", 14}, {"green", 13}};
       return g.id != 0 &&
         ranges::all_of(
           g.draws | views::join,    // Flatten the draws
-          [&possible](SingleDraw d) {
+          [&possible](auto d) {
             return d.num <= possible.at(d.color);
           }
         );
@@ -67,9 +67,9 @@ Result solvePartOne(const string &input) {
 
 Result solvePartTwo(const string &input) {
   auto power = parseInput(input)
-    | views::transform([](Game g) {   // Get the power of each game
-      unordered_map<string, int> max_d = {{"red", 0}, {"blue", 0}, {"green", 0}};
-      for (SingleDraw d : g.draws | views::join) {    // Flatten draws
+    | views::transform([](auto g) {   // Get the power of each game
+      auto max_d = unordered_map<string, int>{{"red", 0}, {"blue", 0}, {"green", 0}};
+      for (auto d : g.draws | views::join) {    // Flatten draws
         max_d[d.color] = max(max_d[d.color], d.num);
       }
       return max_d["red"] * max_d["blue"] * max_d["green"];

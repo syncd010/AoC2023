@@ -35,11 +35,11 @@ vector<Brick> parseInput(const string &input) {
 }
 
 auto settleDown(vector<Brick> &bricks) {
-  int wellsz = 1 + foldLeft(bricks, 0, [](int prev, auto &b) { return max(prev, max(b.second.x, b.second.y)); });
+  auto wellsz = 1 + foldLeft(bricks, 0, [](int prev, auto &b) { return max(prev, max(b.second.x, b.second.y)); });
   auto well = vector(wellsz, vector<pair<int, int>>(wellsz, {0, -1}));
   auto supportsBellow = vector(bricks.size(), vector<int>{});
   for (int i = 0; i < bricks.size(); i++) {
-    int maxHeight = 0;
+    auto maxHeight = 0;
     for (int y = bricks[i].first.y; y <= bricks[i].second.y; y++) {
       for (int x = bricks[i].first.x; x <= bricks[i].second.x; x++) {
         auto [height, supporterId] = well[y][x];
@@ -98,7 +98,7 @@ Result solvePartTwo(const string &input) {
 
   // Mark each brick as fallen and process a queue of fallen bricks. Mark bricks 
   // supported by them ones as fallen if all of their supports have fallen
-  int count = 0;
+  auto count = 0;
   auto fallen = vector<int>(bricks.size());
   for (int i = 0; i < bricks.size(); i++) {
     ranges::fill(fallen, 0);

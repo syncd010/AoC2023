@@ -35,7 +35,7 @@ pair<int, vec2<int>> findReflectionRow(const vector<string> &pattern, bool allow
   int h = pattern.size();
   for (int row = 1; row < h; row++) {
     bool reflected = true;
-    vec2<int> diffPos(-1, -1);
+    auto diffPos = vec2<int>{ -1, -1 };
     // Check if rows are reflected around current one
     for (int i = 0; i < min(row, h - row); i++) {
       if (pattern[row + i] != pattern[row - i - 1]) {
@@ -45,7 +45,7 @@ pair<int, vec2<int>> findReflectionRow(const vector<string> &pattern, bool allow
           // Check if this row has a single diff
           int diffCol = diffsBySinglePos(pattern[row + i], pattern[row - i - 1]);
           if (diffCol != -1) {
-            diffPos = vec2<int>(diffCol, row-i-1);
+            diffPos = vec2<int>{ diffCol, row-i-1 };
             continue;
           }
         }

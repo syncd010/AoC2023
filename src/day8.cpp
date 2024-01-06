@@ -24,9 +24,9 @@ using Graph = unordered_map<string_view, pair<string_view, string_view>>;
 pair<string_view, Graph> parseInput(const string &input) {
   auto lines = input | splitString('\n');
 
-  string_view path = lines.front();
-  Graph graph{};
-  for (string_view l : lines | views::drop(1)) {
+  auto path = lines.front();
+  auto graph = Graph{};
+  for (auto l : lines | views::drop(1)) {
     graph[l.substr(0, 3)] = make_pair(l.substr(7, 3), l.substr(12, 3));
   }
   return make_pair(path, graph);
@@ -35,7 +35,7 @@ pair<string_view, Graph> parseInput(const string &input) {
 // Traverses the `graph`, starting on `start`, following `path` and stopping when `isEndNode` returns true
 int traverse(Graph &graph, string_view start, string_view path, auto isEndNode) {
   int steps = 0;
-  string_view nextNode = start, node = nextNode;
+  auto nextNode = start, node = nextNode;
   // Loop on path until final node found
   for (int i = 0; !isEndNode(node); i = (i+1) % path.length(), steps++, node = nextNode) {
     nextNode = (path[i] == 'L') ? graph[node].first : graph[node].second;

@@ -26,7 +26,7 @@ Result solvePartOne(const string &input) {
   // Distance is given by d(t) = t(T-t), so the solution is d(t) > D, with T 
   // and D given in the input. Apply quadratic formula to get (minT, maxT)
   // Solutions are the integers in the interval (minT, maxT)
-  int ret = 1;
+  auto ret = 1;
   for (int i = 0; i < params[0].size(); i++) {
     auto T = params[0][i], D = params[1][i];
     auto minT = (T - sqrt(T*T - 4*D)) / 2,

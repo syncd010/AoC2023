@@ -58,11 +58,11 @@ Pos findStartPos(const auto &maze) {
 
 // Finds the biggest loop on the maze
 vector<Pos> findMaxLoop(const auto &maze) {
-  const vector<Dir> dirs{ EAST, WEST, NORTH, SOUTH };
+  const auto dirs = vector<Dir>{ EAST, WEST, NORTH, SOUTH };
   const auto exits = getExits();
 
-  Pos startPos = findStartPos(maze);
-  vector<Pos> maxLoop{};
+  auto startPos = findStartPos(maze);
+  auto maxLoop = vector<Pos>{};
   // Try each direction from the start position
   for (auto d : dirs) {
     auto entryDir = rotate180(d);
@@ -70,14 +70,14 @@ vector<Pos> findMaxLoop(const auto &maze) {
     if (!insideBoard(maze, currPos)) continue;
 
     // Follow maze until returning to start position
-    vector<Pos> currLoop{currPos};
+    auto currLoop = vector<Pos>{currPos};
     while (currPos != startPos) {
       // Handle dead ends '.'
       if (!exits.contains(maze[currPos.y][currPos.x])) break;
 
-      const pair<Dir, Dir> &dirs = exits.at(maze[currPos.y][currPos.x]);
+      const auto &dirs = exits.at(maze[currPos.y][currPos.x]);
       // Exit dir is the opposite of entry dir
-      Dir exitDir = 
+      auto exitDir = 
         (entryDir == dirs.first) ? dirs.second : 
           (entryDir == dirs.second) ? dirs.first : INVALID;
       // Break if no suitable exit found, this cell isn't a continuation of the previous one
@@ -136,8 +136,8 @@ Result solvePartTwo(const string &input) {
   // [L, J] otherwise we could be double inverting the indicator 
   bool in = false;
   int64_t inCount = 0;
-  for (size_t y = 0; y < h; y++) {
-    for (size_t x = 0; x < w; x++) {
+  for (auto y = 0; y < h; y++) {
+    for (auto x = 0; x < w; x++) {
       switch (scratch[y][x]) {
       case '|': case 'F': case '7':
         in = !in;
